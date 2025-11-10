@@ -180,7 +180,6 @@ export function UsedModuleCopyDialog({
               loading={loading}
               onCancel={onClose}
               confirmText="Copiar"
-              confirmClassName="bg-green-600 hover:bg-green-700 text-white"
             />
           </form>
         </DialogContent>
