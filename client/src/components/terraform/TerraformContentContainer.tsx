@@ -31,98 +31,96 @@ export function TerraformContentContainer({
   const [activeTerminalTab, setActiveTerminalTab] = useState<string | null>(null);
   const [executingPaths, setExecutingPaths] = useState<Set<string>>(new Set());
 
-
-    const handleClearOutput = (tab: string, index: number) => {
-  setTerminalByPath((prev) => {
-    const copy = new Map(prev);
-    const arr = copy.get(tab) ?? [];
-    if (index >= 0 && index < arr.length) {
-      const newArr = arr.filter((_, i) => i !== index);
-      if (newArr.length > 0) {
-        copy.set(tab, newArr);
-      } else {
-        copy.delete(tab);
-        if (activeTerminalTab === tab) {
-          const keys = Array.from(copy.keys());
-          setActiveTerminalTab(keys.length > 0 ? keys[0] : null);
+  const handleClearOutput = (tab: string, index: number) => {
+    setTerminalByPath((prev) => {
+      const copy = new Map(prev);
+      const arr = copy.get(tab) ?? [];
+      if (index >= 0 && index < arr.length) {
+        const newArr = arr.filter((_, i) => i !== index);
+        if (newArr.length > 0) {
+          copy.set(tab, newArr);
+        } else {
+          copy.delete(tab);
+          if (activeTerminalTab === tab) {
+            const keys = Array.from(copy.keys());
+            setActiveTerminalTab(keys.length > 0 ? keys[0] : null);
+          }
         }
       }
-    }
-    return copy;
-  });
-};
+      return copy;
+    });
+  };
 
-const handleClearTab = (tab: string) => {
-  setTerminalByPath((prev) => {
-    const copy = new Map(prev);
-    copy.delete(tab);
+  const handleClearTab = (tab: string) => {
+    setTerminalByPath((prev) => {
+      const copy = new Map(prev);
+      copy.delete(tab);
 
-    if (activeTerminalTab === tab) {
-      const keys = Array.from(copy.keys());
-      setActiveTerminalTab(keys.length > 0 ? keys[0] : null);
-    }
-    return copy;
-  });
-};
+      if (activeTerminalTab === tab) {
+        const keys = Array.from(copy.keys());
+        setActiveTerminalTab(keys.length > 0 ? keys[0] : null);
+      }
+      return copy;
+    });
+  };
 
 
-const handleExecuteCommand = async (cmd: string, path: string) => {
-  setExecutingPaths((prev) => new Set(prev).add(path));
-
-  setTerminalByPath((prev) => {
-    const copy = new Map(prev);
-    if (!copy.has(path)) copy.set(path, []);
-    return copy;
-  });
-  setActiveTerminalTab(path);
-
-  try {
-    const result = await executeCommand({ command: cmd, workingDir: path });
-
-    const output: CommandResponse = {
-      command: cmd,
-      output: result.output,
-      exitCode: result.exitCode,
-      timestamp: new Date(),
-      executionTimeMs: result.executionTimeMs,
-      workingDir: path,
-    };
+  const handleExecuteCommand = async (cmd: string, path: string) => {
+    setExecutingPaths((prev) => new Set(prev).add(path));
 
     setTerminalByPath((prev) => {
       const copy = new Map(prev);
-      const arr = copy.get(path) ?? [];
-      copy.set(path, [output, ...arr]);
-      return copy;
-    });
-
-    setActiveTerminalTab(path);
-  } catch (e) {
-    const output: CommandResponse = {
-      command: cmd,
-      output: e instanceof Error ? e.message : "Unknown error",
-      exitCode: 1,
-      timestamp: new Date(),
-      workingDir: path,
-      executionTimeMs: 1,
-    };
-    setTerminalByPath((prev) => {
-      const copy = new Map(prev);
-      const arr = copy.get(path) ?? [];
-      copy.set(path, [output, ...arr]);
+      if (!copy.has(path)) copy.set(path, []);
       return copy;
     });
     setActiveTerminalTab(path);
-  } finally {
-    setExecutingPaths((prev) => {
-      const copy = new Set(prev);
-      copy.delete(path);
-      return copy;
-    });
-  }
-};
 
-const isSelectedExecuting = selectedPath ? executingPaths.has(selectedPath) : false;
+    try {
+      const result = await executeCommand({ command: cmd, workingDir: path });
 
+      const output: CommandResponse = {
+        command: cmd,
+        output: result.output,
+        exitCode: result.exitCode,
+        timestamp: new Date(),
+        executionTimeMs: result.executionTimeMs,
+        workingDir: path,
+      };
+
+      setTerminalByPath((prev) => {
+        const copy = new Map(prev);
+        const arr = copy.get(path) ?? [];
+        copy.set(path, [output, ...arr]);
+        return copy;
+      });
+
+      setActiveTerminalTab(path);
+    } catch (e) {
+      const output: CommandResponse = {
+        command: cmd,
+        output: e instanceof Error ? e.message : "Unknown error",
+        exitCode: 1,
+        timestamp: new Date(),
+        workingDir: path,
+        executionTimeMs: 1,
+      };
+      setTerminalByPath((prev) => {
+        const copy = new Map(prev);
+        const arr = copy.get(path) ?? [];
+        copy.set(path, [output, ...arr]);
+        return copy;
+      });
+      setActiveTerminalTab(path);
+    } finally {
+      setExecutingPaths((prev) => {
+        const copy = new Set(prev);
+        copy.delete(path);
+        return copy;
+      });
+    }
+  };
+
+  const isSelectedExecuting = selectedPath ? executingPaths.has(selectedPath) : false;
 
   function getSelectedItem(): TerraformModule | Project | null {
     if (!structure || !selectedPath || !selectedType) return null;
@@ -147,7 +145,7 @@ const isSelectedExecuting = selectedPath ? executingPaths.has(selectedPath) : fa
 
   const selectedItem = getSelectedItem();
 
- const [showFileDialog, setShowFileDialog] = useState(false);
+  const [showFileDialog, setShowFileDialog] = useState(false);
   const [editingFile, setEditingFile] = useState<{ name: string; path: string } | null>(null);
 
   return (

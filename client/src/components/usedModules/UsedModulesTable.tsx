@@ -19,6 +19,7 @@ import { ExecuteAllModal } from "@/components/dialogs/ExecuteAllModal";
 import { UsedModuleCopyDialog } from "@/components/usedModules/UsedModuleCopyDialog";
 import { TerraformService } from "@/services/TerraformService";
 import { StructureContext } from "@/contexts/StructureContext";
+import type { CommandResponse } from "@/interfaces/responses/CommandResponse";
 
 export function UsedModulesTable() {
   const { structure, loadStructure } = useContext(StructureContext);
@@ -47,7 +48,7 @@ export function UsedModulesTable() {
     ([accountName, moduleName]: [string, string]) => UsedModuleService.delete(accountName, moduleName)
   );
 
-  const { execute: executeAllCommand } = useServiceHook(
+  const { execute: executeAllCommand, loading: executingAllLoading } = useServiceHook(
     (req: { command: string; workingDirs: string[] }) => TerraformService.executeAll(req)
   );
 
@@ -130,14 +131,18 @@ export function UsedModulesTable() {
     setExecuteModalOpen(true);
   };
 
-  const handleExecuteSelected = async (command: string, selected: string[]) => {
+  const handleExecuteSelected = async (command: string, selected: string[]): Promise<CommandResponse[]> => {
     if (selected.length === 0) {
       toast.error("Nenhum projeto selecionado.");
-      return;
+      return [];
     }
-    await executeAllCommand({ command, workingDirs: selected });
-    toast.success(`Comando "${command}" executado em ${selected.length} projeto(s)`);
-    setExecuteModalOpen(false);
+
+    const response = await executeAllCommand({ command, workingDirs: selected });
+    return response.results.map((r, i) => ({
+      ...r,
+      workingDir: selected[i] || "unknown",
+      timestamp: new Date(),
+    }));
   };
 
   return (
@@ -211,7 +216,7 @@ export function UsedModulesTable() {
                       variant="ghost"
                       size="icon"
                       className="h-9 w-9 rounded-md bg-green-600 text-white hover:bg-green-700"
-                      title="Executar projetos deste used module"
+                      title="Executar todos os projetos"
                       onClick={() => openExecuteModalForModule(selectedAccount, mod.name)}
                     >
                       <PlayCircle className="w-4 h-4" />
@@ -228,7 +233,7 @@ export function UsedModulesTable() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 rounded-md bg-orange-500 text-white hover:bg-orange-400 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                      className="h-9 w-9 rounded-md bg-orange-500 text-white hover:bg-orange-400"
                       title="Editar"
                       onClick={() => openEditDialog(mod.name)}
                     >
@@ -237,7 +242,7 @@ export function UsedModulesTable() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 rounded-md bg-red-500 text-white hover:bg-red-400 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                      className="h-9 w-9 rounded-md bg-red-500 text-white hover:bg-red-400"
                       title="Excluir"
                       disabled={deleting}
                       onClick={() => openDeleteConfirm(mod.name)}
@@ -292,6 +297,7 @@ export function UsedModulesTable() {
         onClose={() => setExecuteModalOpen(false)}
         onExecute={handleExecuteSelected}
         onProjectSelectionChange={setExecuteProjects}
+        loading={executingAllLoading}
       />
     </div>
   );
