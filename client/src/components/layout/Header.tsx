@@ -9,14 +9,16 @@ import {
 import { ButtonWithTooltip } from "@/components/common/ButtonWithTooltipProps";
 import { LogoTitle } from "./LogoTitle";
 import type { AppView } from "@/types/AppView";
+import { useContext } from "react";
+import { StructureContext } from "@/contexts/StructureContext";
 
 interface HeaderProps {
   setActiveView: (view: AppView) => void;
-  loadStructure: () => void;
 }
 
-export function Header({ loadStructure, setActiveView }: HeaderProps) {
-
+export function Header({ setActiveView }: HeaderProps) {
+  const { loadStructure } = useContext(StructureContext);
+  
   return (
     <header className="bg-linear-to-r from-slate-900 to-slate-800 text-white px-6 py-4 shadow-lg flex items-center">
       <LogoTitle />

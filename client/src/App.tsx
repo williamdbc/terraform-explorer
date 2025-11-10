@@ -57,8 +57,6 @@ export default function App() {
   return (
     <StructureProvider>
       <Layout
-        loadStructure={loadStructure}
-        structure={structure}
         selectedPath={selectedPath}
         onSelectItem={handleSelectItem}
         activeView={activeView}
@@ -66,11 +64,9 @@ export default function App() {
       >
         <MainContent
           activeView={activeView}
-          structure={structure}
           selectedPath={selectedPath}
           selectedType={selectedType}
           onSelectItem={handleSelectItem}
-          loadStructure={loadStructure}
         />
       </Layout>
     </StructureProvider>

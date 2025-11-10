@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { TerraformContent } from "@/components/terraform/TerraformContent";
-import type { TerraformStructure, TerraformModule, Project } from "@/interfaces/TerraformStructure";
+import type { TerraformModule, Project } from "@/interfaces/TerraformStructure";
 import { SelectedType } from "@/enums/SelectedType";
 import { useServiceHook } from "@/hooks/useServiceHook";
 import { TerraformService } from "@/services/TerraformService";
@@ -8,21 +8,20 @@ import type { CommandResponse } from "@/interfaces/responses/CommandResponse";
 import type { CommandRequest } from "@/interfaces/requests/CommandRequest";
 import { FileCreateDialog } from "@/components/files/FileCreateDialog";
 import { FileEditorDialog } from "@/components/files/FileEditorDialog";
+import { StructureContext } from "@/contexts/StructureContext";
 
 interface TerraformContentContainerProps {
-  structure: TerraformStructure | null;
   selectedPath: string | null;
   selectedType: SelectedType | null;
   onSelectItem: (path: string, type: SelectedType) => void;
-  loadStructure: () => void;
 }
 
 export function TerraformContentContainer({
-  structure,
   selectedPath,
   selectedType,
-  loadStructure
 }: TerraformContentContainerProps) {
+  const { structure, loadStructure } = useContext(StructureContext);
+
   const { execute: executeCommand } = useServiceHook(
     (req: CommandRequest) => TerraformService.executeCommand(req)
   );
