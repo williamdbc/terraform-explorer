@@ -1,0 +1,36 @@
+name: Terraform Explorer - Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - release/**
+
+jobs:
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ['self-hosted', 'prod']
+    env:
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_PRD }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Subir containers (PROD)
+        run: |
+          docker-compose down || true
+          docker-compose up -d --build
+
+  deploy-hml:
+    if: startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ['self-hosted', 'hml']
+    env:
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_HML }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Subir containers (HML)
+        run: |
+          docker-compose down || true
+          docker-compose up -d --build

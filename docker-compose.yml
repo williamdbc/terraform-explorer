@@ -1,0 +1,36 @@
+services:
+  backend:
+    container_name: terraformmanager-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ${HOME}/terraform-explorer:/root/terraform-explorer
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    working_dir: /app
+    networks:
+      - app-network
+    restart: always
+
+  frontend:
+    container_name: terraformmanager-client
+    build:
+      context: ./client
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: always 
+
+networks:
+  app-network:
+    driver: bridge
