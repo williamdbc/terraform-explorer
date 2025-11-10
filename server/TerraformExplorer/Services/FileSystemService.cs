@@ -16,7 +16,8 @@ public class FileSystemService
 
     private string Validate(string path)
     {
-        var full = Path.GetFullPath(path);
+        var decoded = WebUtility.UrlDecode(path);
+        var full = Path.GetFullPath(decoded);
         if (!full.StartsWith(_rootPath, StringComparison.OrdinalIgnoreCase))
             throw new UnauthorizedAccessException("Fora do diretório permitido.");
         return full;
@@ -94,16 +95,33 @@ public class FileSystemService
 
         Directory.CreateDirectory(destFull);
         
+        var filesToIgnore = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "terraform.tfstate",
+            "terraform.tfstate.backup",
+            ".terraform.lock.hcl"
+        };
+        
+        var dirToIgnore = ".terraform";
+        
         foreach (var file in Directory.GetFiles(sourceFull))
         {
-            var destFile = Path.Combine(destFull, Path.GetFileName(file));
+            var fileName = Path.GetFileName(file);
+            if (filesToIgnore.Contains(fileName))
+                continue;
+
+            var destFile = Path.Combine(destFull, fileName);
             File.Copy(file, destFile, overwrite: false);
         }
         
         foreach (var dir in Directory.GetDirectories(sourceFull))
         {
-            var destDir = Path.Combine(destFull, Path.GetFileName(dir));
-            CopyDirectory(dir, destDir); // recursivo
+            var dirName = Path.GetFileName(dir);
+            if (string.Equals(dirName, dirToIgnore, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var destDir = Path.Combine(destFull, dirName);
+            CopyDirectory(dir, destDir);
         }
     }
     
