@@ -1,0 +1,137 @@
+## ===============================================
+## .GITIGNORE - Projeto .NET + React (Vite/CRA)
+## ===============================================
+
+# =================================================
+# 🧱 SEÇÃO .NET / ASP.NET CORE
+# =================================================
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+
+# Temporary / Misc
+~$*
+*~
+CodeCoverage/
+*.binlog
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# User / IDE-specific files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core environment files (não versionar configs locais)
+appsettings.json
+appsettings.*.json
+secrets.json
+
+# Local database files
+*.mdf
+*.ldf
+*.sqlite
+
+# Local history (VSCode, Rider)
+.localhistory/
+
+# Azure function artifacts
+.local/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+
+# =================================================
+# ⚛️ SEÇÃO FRONTEND (React / Node.js)
+# =================================================
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+bower_components/
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# Local environment files
+.env
+.env.*
+!.env.example   # mantém o modelo de exemplo no repositório
+
+# Cache / temp
+*.local
+.cache/
+.temp/
+.tmp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TypeScript
+*.tsbuildinfo
+
+# =================================================
+# 🚀 EXTRA
+# =================================================
+# Logs / Artifacts comuns
+coverage/
+*.tgz
+*.zip
+*.tar.gz
+*.rar
