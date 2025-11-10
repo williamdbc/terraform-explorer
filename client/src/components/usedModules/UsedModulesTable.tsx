@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState, useContext } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import { ExecuteAllModal } from "@/components/dialogs/ExecuteAllModal";
 import { UsedModuleCopyDialog } from "@/components/usedModules/UsedModuleCopyDialog";
 import { TerraformService } from "@/services/TerraformService";
 import { StructureContext } from "@/contexts/StructureContext";
+import type { CommandResponse } from "@/interfaces/responses/CommandResponse";
 
 export function UsedModulesTable() {
   const { structure, loadStructure } = useContext(StructureContext);
@@ -29,16 +30,17 @@ export function UsedModulesTable() {
   const [editingModuleName, setEditingModuleName] = useState<string | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [moduleToDelete, setModuleToDelete] = useState<string | null>(null);
-  const [showExecuteModal, setShowExecuteModal] = useState(false);
   const [showCopyDialog, setShowCopyDialog] = useState(false);
   const [copySource, setCopySource] = useState<{ accountName: string; moduleName: string } | null>(null);
 
+  const [executeModalOpen, setExecuteModalOpen] = useState(false);
+  const [executeProjects, setExecuteProjects] = useState<string[]>([]);
+  const [allModuleProjects, setAllModuleProjects] = useState<{ name: string; path: string }[]>([]);
+  const [executeAccount, setExecuteAccount] = useState<string | undefined>(undefined);
+  const [executeUsedModule, setExecuteUsedModule] = useState<string | undefined>(undefined);
+
   const account = accounts.find(acc => acc.name === selectedAccount);
   const usedModules = selectedAccount ? account?.usedModules ?? [] : [];
-
-  const allProjectPaths = selectedAccount && usedModules.length > 0
-    ? usedModules.flatMap(mod => mod.projects.map(proj => proj.path))
-    : [];
 
   const accountOptions = accounts.map(acc => ({ value: acc.name, label: acc.name }));
 
@@ -46,7 +48,7 @@ export function UsedModulesTable() {
     ([accountName, moduleName]: [string, string]) => UsedModuleService.delete(accountName, moduleName)
   );
 
-  const { execute: executeAllCommand, loading: executingAll } = useServiceHook(
+  const { execute: executeAllCommand, loading: executingAllLoading } = useServiceHook(
     (req: { command: string; workingDirs: string[] }) => TerraformService.executeAll(req)
   );
 
@@ -112,9 +114,35 @@ export function UsedModulesTable() {
     loadStructure();
   };
 
-  const handleExecuteAll = async (workingDirs: string[], command: string) => {
-    await executeAllCommand({ command, workingDirs });
-    toast.success(`Comando "${command}" executado em ${workingDirs.length} projetos`);
+  const openExecuteModalForModule = (accountName: string, moduleName: string) => {
+    const acc = accounts.find(acc => acc.name === accountName);
+    const usedModule = acc?.usedModules.find(mod => mod.name === moduleName);
+    if (!usedModule) return;
+
+    const projects = usedModule.projects.map(proj => ({
+      name: proj.name,
+      path: proj.path,
+    }));
+
+    setExecuteAccount(accountName);
+    setExecuteUsedModule(moduleName);
+    setAllModuleProjects(projects);
+    setExecuteProjects(projects.map(p => p.path));
+    setExecuteModalOpen(true);
+  };
+
+  const handleExecuteSelected = async (command: string, selected: string[]): Promise<CommandResponse[]> => {
+    if (selected.length === 0) {
+      toast.error("Nenhum projeto selecionado.");
+      return [];
+    }
+
+    const response = await executeAllCommand({ command, workingDirs: selected });
+    return response.results.map((r, i) => ({
+      ...r,
+      workingDir: selected[i] || "unknown",
+      timestamp: new Date(),
+    }));
   };
 
   return (
@@ -122,14 +150,6 @@ export function UsedModulesTable() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-slate-900">Used Modules</h2>
         <div className="flex gap-2">
-          <Button
-            onClick={() => setShowExecuteModal(true)}
-            disabled={!selectedAccount || allProjectPaths.length === 0 || executingAll}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <PlayCircle className="w-4 h-4 mr-2" />
-            Execute All ({allProjectPaths.length})
-          </Button>
           <Button
             onClick={openCreateDialog}
             className="bg-green-600 hover:bg-green-700 text-white"
@@ -176,8 +196,9 @@ export function UsedModulesTable() {
               usedModules.map((mod, index) => (
                 <TableRow
                   key={mod.name}
-                  className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${index === usedModules.length - 1 ? "border-b-0" : ""
-                    }`}
+                  className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${
+                    index === usedModules.length - 1 ? "border-b-0" : ""
+                  }`}
                 >
                   <TableCell>
                     <div className="flex flex-col">
@@ -194,6 +215,15 @@ export function UsedModulesTable() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-9 w-9 rounded-md bg-green-600 text-white hover:bg-green-700"
+                      title="Executar todos os projetos"
+                      onClick={() => openExecuteModalForModule(selectedAccount, mod.name)}
+                    >
+                      <PlayCircle className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-9 w-9 rounded-md bg-blue-600 text-white hover:bg-blue-700"
                       title="Copiar"
                       onClick={() => openCopyDialog(selectedAccount, mod.name)}
@@ -203,7 +233,7 @@ export function UsedModulesTable() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 rounded-md bg-orange-500 text-white hover:bg-orange-400 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                      className="h-9 w-9 rounded-md bg-orange-500 text-white hover:bg-orange-400"
                       title="Editar"
                       onClick={() => openEditDialog(mod.name)}
                     >
@@ -212,7 +242,7 @@ export function UsedModulesTable() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 rounded-md bg-red-500 text-white hover:bg-red-400 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                      className="h-9 w-9 rounded-md bg-red-500 text-white hover:bg-red-400"
                       title="Excluir"
                       disabled={deleting}
                       onClick={() => openDeleteConfirm(mod.name)}
@@ -259,10 +289,15 @@ export function UsedModulesTable() {
       />
 
       <ExecuteAllModal
-        open={showExecuteModal}
-        projects={allProjectPaths}
-        onClose={() => setShowExecuteModal(false)}
-        onExecute={handleExecuteAll}
+        open={executeModalOpen}
+        projects={allModuleProjects}
+        selectedProjects={executeProjects}
+        accountName={executeAccount}
+        usedModuleName={executeUsedModule}
+        onClose={() => setExecuteModalOpen(false)}
+        onExecute={handleExecuteSelected}
+        onProjectSelectionChange={setExecuteProjects}
+        loading={executingAllLoading}
       />
     </div>
   );

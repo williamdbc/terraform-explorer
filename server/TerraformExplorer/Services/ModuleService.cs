@@ -50,11 +50,59 @@ public class ModuleService
         _fileSystemService.DeleteDirectory(path);
     }
 
-    public void Rename(string oldName, string newName)
+public void Rename(string oldName, string newName)
+{
+    if (string.IsNullOrWhiteSpace(newName))
+        throw new ArgumentException("O novo nome do módulo não pode ser vazio.");
+
+    if (oldName == newName)
+        throw new InvalidOperationException("O novo nome é igual ao atual.");
+
+    var oldPath = GetPath(oldName);
+    var newPath = GetPath(newName);
+
+    _fileSystemService.EnsureExists(oldPath, "Módulo");
+
+    if (Directory.Exists(newPath))
+        throw new InvalidOperationException($"Já existe um módulo com o nome '{newName}'.");
+    
+    _fileSystemService.Rename(oldPath, newPath);
+    
+    UpdateModuleReferencesInProjects(oldName, newName);
+}
+
+private void UpdateModuleReferencesInProjects(string oldModuleName, string newModuleName)
+{
+    var structure = _terraformService.GetStructure();
+    var accountsPath = _terraformSettings.GetAccountsPath();
+
+    if (!Directory.Exists(accountsPath)) return;
+
+    var oldSourcePattern = $"../../../../modules/{oldModuleName}";
+    var newSourcePattern = $"../../../../modules/{newModuleName}";
+
+    foreach (var account in structure.Accounts)
     {
-        var oldPath = GetPath(oldName);
-        var newPath = GetPath(newName);
-        _fileSystemService.Rename(oldPath, newPath);
+        foreach (var usedModule in account.UsedModules)
+        {
+            var projectsPath = usedModule.Path;
+            if (!Directory.Exists(projectsPath)) continue;
+
+            foreach (var projectDir in Directory.GetDirectories(projectsPath))
+            {
+                var mainTfPath = Path.Combine(projectDir, "main.tf");
+                if (!File.Exists(mainTfPath)) continue;
+
+                var content = File.ReadAllText(mainTfPath);
+
+                if (content.Contains(oldSourcePattern))
+                {
+                    var updatedContent = content.Replace(oldSourcePattern, newSourcePattern);
+                    File.WriteAllText(mainTfPath, updatedContent);
+                }
+            }
+        }
     }
+}
     
 }

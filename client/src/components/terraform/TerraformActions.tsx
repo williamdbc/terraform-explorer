@@ -35,7 +35,6 @@ export function TerraformActions({
         )}
       </div>
 
-      {/* Primeira linha: primeiros 4 actions */}
       <div className="flex items-center gap-3 mb-3">
         {TERRAFORM_ACTIONS.slice(0, 4).map((action) => (
           <Button
@@ -51,7 +50,6 @@ export function TerraformActions({
         ))}
       </div>
 
-      {/* Segunda linha: últimos 4 actions */}
       <div className="flex items-center gap-3">
         {TERRAFORM_ACTIONS.slice(4, 8).map((action) => (
           <Button
@@ -67,7 +65,6 @@ export function TerraformActions({
         ))}
       </div>
 
-      {/* Executing Status */}
       {executing && (
         <div className="flex items-center justify-center gap-2 text-blue-700 mt-4 pt-3 border-t border-slate-200">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>

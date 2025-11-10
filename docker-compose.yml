@@ -1,6 +1,6 @@
 services:
   backend:
-    container_name: terraformmanager-server
+    container_name: terraform-explorer-server
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -16,7 +16,7 @@ services:
     restart: always
 
   frontend:
-    container_name: terraformmanager-client
+    container_name: terraform-explorer-client
     build:
       context: ./client
       args:
@@ -29,7 +29,7 @@ services:
       - backend
     networks:
       - app-network
-    restart: always 
+    restart: always
 
 networks:
   app-network:
