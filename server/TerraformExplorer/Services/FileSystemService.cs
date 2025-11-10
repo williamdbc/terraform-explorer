@@ -16,7 +16,8 @@ public class FileSystemService
 
     private string Validate(string path)
     {
-        var full = Path.GetFullPath(path);
+        var decoded = WebUtility.UrlDecode(path);
+        var full = Path.GetFullPath(decoded);
         if (!full.StartsWith(_rootPath, StringComparison.OrdinalIgnoreCase))
             throw new UnauthorizedAccessException("Fora do diretório permitido.");
         return full;
