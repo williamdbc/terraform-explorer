@@ -32,18 +32,20 @@ public static class TerraformCommandExecutor
         var maxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount);
         var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
         
-        var tasks = validDirs.Select(async dir =>
-        {
-            await semaphore.WaitAsync();
-            try
+        var tasks = validDirs
+            .Select(dir => Task.Run(async () =>
             {
-                return await ExecuteSingleAsync(request.Command, dir, settings);
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        });
+                await semaphore.WaitAsync();
+                try
+                {
+                    return await ExecuteSingleAsync(request.Command, dir, settings);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }))
+            .ToArray();
 
         var results = await Task.WhenAll(tasks);
 
