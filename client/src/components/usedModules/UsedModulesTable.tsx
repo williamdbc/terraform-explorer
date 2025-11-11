@@ -140,6 +140,7 @@ export function UsedModulesTable() {
     const response = await executeAllCommand({ command, workingDirs: selected });
     return response.results.map((r, i) => ({
       ...r,
+      command: command,
       workingDir: selected[i] || "unknown",
       timestamp: new Date(),
     }));

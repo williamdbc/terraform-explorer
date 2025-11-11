@@ -11,7 +11,7 @@ public static class TerraformStructureLoader
         {
             RootPath = settings.GetRootPath(),
             Modules = LoadModules(settings.GetModulesPath()),
-            Accounts = LoadAccounts(settings.GetAccountsPath(), settings.GetProvidersPath()),
+            Accounts = LoadAccounts(settings.GetAccountsPath()),
             Providers = LoadProviders(settings.GetProvidersPath())
         };
     }
@@ -32,10 +32,12 @@ public static class TerraformStructureLoader
             });
         }
 
-        return modules;
+        return modules
+            .OrderBy(m => m.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
-    public static List<Account> LoadAccounts(string accountsPath, string providersPath)
+    public static List<Account> LoadAccounts(string accountsPath)
     {
         var accounts = new List<Account>();
         if (!Directory.Exists(accountsPath)) return accounts;
@@ -61,7 +63,9 @@ public static class TerraformStructureLoader
             accounts.Add(account);
         }
 
-        return accounts;
+        return accounts
+            .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
     
     public static List<UsedModule> LoadUsedModules(string accountPath)
@@ -77,7 +81,9 @@ public static class TerraformStructureLoader
             });
         }
 
-        return usedModules;
+        return usedModules
+            .OrderBy(um => um.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     public static List<Project> LoadProjects(string usedModulePath)
@@ -93,7 +99,9 @@ public static class TerraformStructureLoader
             });
         }
 
-        return projects;
+        return projects
+            .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     public static List<Provider> LoadProviders(string providersPath)
@@ -106,6 +114,7 @@ public static class TerraformStructureLoader
         
         var providers = profileResponses
             .Select(p => new Provider { Name = p.Name })
+            .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         return providers;
@@ -124,6 +133,8 @@ public static class TerraformStructureLoader
             });
         }
 
-        return files;
+        return files
+            .OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 }
