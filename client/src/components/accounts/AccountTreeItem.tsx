@@ -1,4 +1,5 @@
-import { UsedModuleTreeItem } from "@/components/usedModules/UsedModuleTreeItem";
+
+import { ProjectGroupTreeItem } from "@/components/projectGroup/ProjectGroupTreeItem";
 import type { SelectedType } from "@/enums/SelectedType";
 import type { Account } from "@/interfaces/TerraformStructure";
 import { cn } from "@/lib/utils";
@@ -44,17 +45,17 @@ export function AccountTreeItem({
           <Folder className="w-4 h-4 text-blue-600" />
         )}
         <span className="font-medium text-slate-900 truncate">{account.name}</span>
-        <span className="ml-auto text-xs text-slate-500">{account.usedModules.length}</span>
+        <span className="ml-auto text-xs text-slate-500">{account.projectGroups.length}</span>
       </button>
 
       {expanded && (
         <div className="ml-4">
-          {account.usedModules.map(usedModule => (
-            <UsedModuleTreeItem
-              key={usedModule.path}
-              usedModule={usedModule}
-              expanded={expandedItems.has(usedModule.path)}
-              onToggle={() => toggleItem(usedModule.path)}
+          {account.projectGroups.map(projectGroup => (
+            <ProjectGroupTreeItem
+              key={projectGroup.path}
+              projectGroup={projectGroup}
+              expanded={expandedItems.has(projectGroup.path)}
+              onToggle={() => toggleItem(projectGroup.path)}
               selectedPath={selectedPath}
               onSelect={onSelect}
             />

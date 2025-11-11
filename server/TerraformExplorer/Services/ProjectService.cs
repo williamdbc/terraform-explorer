@@ -70,13 +70,13 @@ public class ProjectService
         var account = structure.Accounts.FirstOrDefault(a => a.Name == request.AccountName)
                       ?? throw new DirectoryNotFoundException($"Account {request.AccountName} not found.");
 
-        var usedModule = account.UsedModules.FirstOrDefault(m => m.Name == request.UsedModuleName)
-                         ?? throw new DirectoryNotFoundException($"UsedModule {request.UsedModuleName} not found in account {request.AccountName}.");
+        var projectGroup = account.ProjectGroups.FirstOrDefault(m => m.Name == request.ProjectGroupName)
+                         ?? throw new DirectoryNotFoundException($"UsedModule {request.ProjectGroupName} not found in account {request.AccountName}.");
 
         var sourceModule = structure.Modules.FirstOrDefault(m => m.Name == request.ModuleName)
                            ?? throw new DirectoryNotFoundException($"Module {request.ModuleName} not found in modules/.");
 
-        var projectPath = Path.Combine(usedModule.Path, request.ProjectName);
+        var projectPath = Path.Combine(projectGroup.Path, request.ProjectName);
         if (Directory.Exists(projectPath))
             throw new InvalidOperationException($"Project {request.ProjectName} already exists.");
 

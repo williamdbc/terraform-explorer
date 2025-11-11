@@ -48,7 +48,7 @@ public static class TerraformStructureLoader
             {
                 Name = Path.GetFileName(accountDir),
                 Path = accountDir,
-                UsedModules = LoadUsedModules(accountDir)
+                ProjectGroups = LoadProjectGroups(accountDir)
             };
             
             var providerTfPath = Path.Combine(accountDir, "provider.tf");
@@ -68,28 +68,28 @@ public static class TerraformStructureLoader
             .ToList();
     }
     
-    public static List<UsedModule> LoadUsedModules(string accountPath)
+    public static List<ProjectGroup> LoadProjectGroups(string accountPath)
     {
-        var usedModules = new List<UsedModule>();
-        foreach (var usedModuleDir in Directory.GetDirectories(accountPath))
+        var projectGroups = new List<ProjectGroup>();
+        foreach (var projectGroupPath in Directory.GetDirectories(accountPath))
         {
-            usedModules.Add(new UsedModule
+            projectGroups.Add(new ProjectGroup
             {
-                Name = Path.GetFileName(usedModuleDir),
-                Path = usedModuleDir,
-                Projects = LoadProjects(usedModuleDir)
+                Name = Path.GetFileName(projectGroupPath),
+                Path = projectGroupPath,
+                Projects = LoadProjects(projectGroupPath)
             });
         }
 
-        return usedModules
+        return projectGroups
             .OrderBy(um => um.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
 
-    public static List<Project> LoadProjects(string usedModulePath)
+    public static List<Project> LoadProjects(string projectGroupPath)
     {
         var projects = new List<Project>();
-        foreach (var projectDir in Directory.GetDirectories(usedModulePath))
+        foreach (var projectDir in Directory.GetDirectories(projectGroupPath))
         {
             projects.Add(new Project
             {

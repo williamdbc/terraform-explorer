@@ -19,7 +19,7 @@ interface ProjectRenameDialogProps {
   open: boolean;
   onClose: () => void;
   accountName: string;
-  usedModuleName: string;
+  projectGroupName: string;
   projectName: string;
   onRenameSuccess?: (newName: string) => void;
 }
@@ -28,7 +28,7 @@ export function ProjectRenameDialog({
   open,
   onClose,
   accountName,
-  usedModuleName,
+  projectGroupName,
   projectName,
   onRenameSuccess,
 }: ProjectRenameDialogProps) {
@@ -37,7 +37,7 @@ export function ProjectRenameDialog({
 
   const { execute: renameProject, loading } = useServiceHook(
     (newProjectName: string) =>
-      ProjectService.rename(accountName, usedModuleName, projectName, newProjectName)
+      ProjectService.rename(accountName, projectGroupName, projectName, newProjectName)
   );
 
   useEffect(() => {

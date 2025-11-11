@@ -129,8 +129,8 @@ export function TerraformContentContainer({
     }
 
     for (const account of structure.accounts) {
-      for (const usedModule of account.usedModules) {
-        const project = usedModule.projects.find((p) => p.path === selectedPath);
+      for (const projectGroup of account.projectGroups) {
+        const project = projectGroup.projects.find((p) => p.path === selectedPath);
         if (project) return project;
       }
     }

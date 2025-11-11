@@ -83,9 +83,9 @@ private void UpdateModuleReferencesInProjects(string oldModuleName, string newMo
 
     foreach (var account in structure.Accounts)
     {
-        foreach (var usedModule in account.UsedModules)
+        foreach (var projectGroup in account.ProjectGroups)
         {
-            var projectsPath = usedModule.Path;
+            var projectsPath = projectGroup.Path;
             if (!Directory.Exists(projectsPath)) continue;
 
             foreach (var projectDir in Directory.GetDirectories(projectsPath))

@@ -8,15 +8,15 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useServiceHook } from "@/hooks/useServiceHook";
-import { UsedModuleService } from "@/services/UsedModuleService";
+import { ProjectGroupService } from "@/services/ProjectGroupService";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
 import { FormInput } from "@/components/form/FormInput";
 import { FormSelect } from "@/components/form/FormSelect";
-import type { UsedModuleCopyRequest } from "@/interfaces/requests/UsedModuleCopyRequest";
+import type { ProjectGroupCopyRequest } from "@/interfaces/requests/ProjectGroupCopyRequest";
 import type { Account } from "@/interfaces/TerraformStructure";
 import { DialogFooterButtons } from "@/components/dialogs/DialogFooterButtons";
 
-interface UsedModuleCopyDialogProps {
+interface ProjectGroupCopyDialogProps {
   open: boolean;
   onClose: () => void;
   accounts: Account[];
@@ -25,24 +25,24 @@ interface UsedModuleCopyDialogProps {
   onCopySuccess?: () => void;
 }
 
-export function UsedModuleCopyDialog({
+export function ProjectGroupCopyDialog({
   open,
   onClose,
   accounts,
   accountName,
   usedModuleName,
   onCopySuccess,
-}: UsedModuleCopyDialogProps) {
-  const initialFormData: UsedModuleCopyRequest = {
-    source: { accountName, moduleName: usedModuleName },
-    destination: { accountName, moduleName: "" },
+}: ProjectGroupCopyDialogProps) {
+  const initialFormData: ProjectGroupCopyRequest = {
+    source: { accountName, groupName: usedModuleName },
+    destination: { accountName, groupName: "" },
   };
 
-  const [formData, setFormData] = useState<UsedModuleCopyRequest>(initialFormData);
+  const [formData, setFormData] = useState<ProjectGroupCopyRequest>(initialFormData);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { execute: copyUsedModule, loading } = useServiceHook(
-    (req: UsedModuleCopyRequest) => UsedModuleService.copyUsedModule(req)
+    (req: ProjectGroupCopyRequest) => ProjectGroupService.copyProjectGroup(req)
   );
 
   const accountOptions = useMemo(
@@ -52,7 +52,7 @@ export function UsedModuleCopyDialog({
 
   const sourceModuleOptions = useMemo(() => {
     const sourceAccount = accounts.find((a) => a.name === formData.source.accountName);
-    return sourceAccount?.usedModules.map((m) => ({ value: m.name, label: m.name })) ?? [];
+    return sourceAccount?.projectGroups.map((m) => ({ value: m.name, label: m.name })) ?? [];
   }, [accounts, formData.source.accountName]);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function UsedModuleCopyDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accounts, accountName, usedModuleName]);
 
-  const updateSourceField = (field: keyof UsedModuleCopyRequest["source"], value: string) => {
+  const updateSourceField = (field: keyof ProjectGroupCopyRequest["source"], value: string) => {
     setFormData((prev) => ({
       ...prev,
       source: { ...prev.source, [field]: value },
@@ -70,7 +70,7 @@ export function UsedModuleCopyDialog({
   };
 
   const updateDestinationField = (
-    field: keyof UsedModuleCopyRequest["destination"],
+    field: keyof ProjectGroupCopyRequest["destination"],
     value: string
   ) => {
     setFormData((prev) => ({
@@ -81,22 +81,22 @@ export function UsedModuleCopyDialog({
 
   const handleSourceAccountChange = (value: string) => {
     const acc = accounts.find((a) => a.name === value);
-    const firstModule = acc?.usedModules?.[0]?.name ?? "";
+    const firstModule = acc?.projectGroups?.[0]?.name ?? "";
     updateSourceField("accountName", value);
-    updateSourceField("moduleName", firstModule);
+    updateSourceField("groupName", firstModule);
   };
 
   const handleSourceModuleChange = (value: string) => {
-    updateSourceField("moduleName", value);
+    updateSourceField("groupName", value);
   };
 
   const handleDestAccountChange = (value: string) => {
     updateDestinationField("accountName", value);
-    updateDestinationField("moduleName", "");
+    updateDestinationField("groupName", "");
   };
 
   const handleDestModuleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateDestinationField("moduleName", e.target.value);
+    updateDestinationField("groupName", e.target.value);
   };
 
   const validateForm = (): boolean => {
@@ -105,7 +105,7 @@ export function UsedModuleCopyDialog({
       toast.error("Conta destino é obrigatória");
       return false;
     }
-    if (!d.moduleName.trim()) {
+    if (!d.groupName.trim()) {
       toast.error("Nome do used module destino é obrigatório");
       return false;
     }
@@ -125,7 +125,7 @@ export function UsedModuleCopyDialog({
     toast.success("Used module copiado com sucesso");
     onCopySuccess?.();
     onClose();
-    updateDestinationField("moduleName", "");
+    updateDestinationField("groupName", "");
   };
 
   const handleCancel = () => {
@@ -153,7 +153,7 @@ export function UsedModuleCopyDialog({
 
             <FormSelect
               label="Used Module de Origem"
-              value={formData.source.moduleName}
+              value={formData.source.groupName}
               onValueChange={handleSourceModuleChange}
               options={sourceModuleOptions}
               disabled={loading || !formData.source.accountName}
@@ -170,7 +170,7 @@ export function UsedModuleCopyDialog({
             <FormInput
               id="module-name-dest"
               label="Nome do Used Module Destino"
-              value={formData.destination.moduleName}
+              value={formData.destination.groupName}
               onChange={handleDestModuleNameChange}
               placeholder="nome-do-used-module"
               disabled={loading}
@@ -190,7 +190,7 @@ export function UsedModuleCopyDialog({
         onCancel={handleCancel}
         onConfirm={handleConfirm}
         title="Confirmar cópia"
-        description={`Deseja copiar o used module "${formData.source.moduleName}" da conta "${formData.source.accountName}" para "${formData.destination.moduleName}" na conta "${formData.destination.accountName}"?`}
+        description={`Deseja copiar o used module "${formData.source.groupName}" da conta "${formData.source.accountName}" para "${formData.destination.groupName}" na conta "${formData.destination.accountName}"?`}
         cancelText="Cancelar"
         confirmText="Copiar"
       />

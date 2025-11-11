@@ -11,17 +11,17 @@ import {
 } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
 import { PencilIcon, TrashIcon, Plus, PlayCircle, CopyIcon } from "lucide-react";
-import { UsedModuleCreateEditDialog } from "@/components/usedModules/UsedModuleCreateEditDialog";
-import { UsedModuleService } from "@/services/UsedModuleService";
+import { ProjectGroupService } from "@/services/ProjectGroupService";
 import { useServiceHook } from "@/hooks/useServiceHook";
 import { FormSelect } from "@/components/form/FormSelect";
 import { ExecuteAllModal } from "@/components/dialogs/ExecuteAllModal";
-import { UsedModuleCopyDialog } from "@/components/usedModules/UsedModuleCopyDialog";
 import { TerraformService } from "@/services/TerraformService";
 import { StructureContext } from "@/contexts/StructureContext";
 import type { CommandResponse } from "@/interfaces/responses/CommandResponse";
+import { ProjectGroupCreateEditDialog } from "@/components/projectGroup/ProjectGroupCreateEditDialog";
+import { ProjectGroupCopyDialog } from "@/components/projectGroup/ProjectGroupsCopyDialog";
 
-export function UsedModulesTable() {
+export function ProjectGroupTable() {
   const { structure, loadStructure } = useContext(StructureContext);
   const accounts = structure?.accounts ?? [];
 
@@ -37,15 +37,15 @@ export function UsedModulesTable() {
   const [executeProjects, setExecuteProjects] = useState<string[]>([]);
   const [allModuleProjects, setAllModuleProjects] = useState<{ name: string; path: string }[]>([]);
   const [executeAccount, setExecuteAccount] = useState<string | undefined>(undefined);
-  const [executeUsedModule, setExecuteUsedModule] = useState<string | undefined>(undefined);
+  const [executeProjectGroup, setExecuteProjectGroup] = useState<string | undefined>(undefined);
 
   const account = accounts.find(acc => acc.name === selectedAccount);
-  const usedModules = selectedAccount ? account?.usedModules ?? [] : [];
+  const usedModules = selectedAccount ? account?.projectGroups ?? [] : [];
 
   const accountOptions = accounts.map(acc => ({ value: acc.name, label: acc.name }));
 
   const { execute: deleteUsedModule, loading: deleting } = useServiceHook(
-    ([accountName, moduleName]: [string, string]) => UsedModuleService.delete(accountName, moduleName)
+    ([accountName, moduleName]: [string, string]) => ProjectGroupService.delete(accountName, moduleName)
   );
 
   const { execute: executeAllCommand, loading: executingAllLoading } = useServiceHook(
@@ -116,7 +116,7 @@ export function UsedModulesTable() {
 
   const openExecuteModalForModule = (accountName: string, moduleName: string) => {
     const acc = accounts.find(acc => acc.name === accountName);
-    const usedModule = acc?.usedModules.find(mod => mod.name === moduleName);
+    const usedModule = acc?.projectGroups.find(mod => mod.name === moduleName);
     if (!usedModule) return;
 
     const projects = usedModule.projects.map(proj => ({
@@ -125,7 +125,7 @@ export function UsedModulesTable() {
     }));
 
     setExecuteAccount(accountName);
-    setExecuteUsedModule(moduleName);
+    setExecuteProjectGroup(moduleName);
     setAllModuleProjects(projects);
     setExecuteProjects(projects.map(p => p.path));
     setExecuteModalOpen(true);
@@ -258,7 +258,7 @@ export function UsedModulesTable() {
         </Table>
       </div>
 
-      <UsedModuleCreateEditDialog
+      <ProjectGroupCreateEditDialog
         open={showCreateEdit}
         onClose={closeCreateEditDialog}
         mode={editingModuleName ? "edit" : "create"}
@@ -269,7 +269,7 @@ export function UsedModulesTable() {
         onEditSuccess={handleCreateEditSuccess}
       />
 
-      <UsedModuleCopyDialog
+      <ProjectGroupCopyDialog
         open={showCopyDialog}
         onClose={closeCopyDialog}
         accounts={accounts}
@@ -294,7 +294,7 @@ export function UsedModulesTable() {
         projects={allModuleProjects}
         selectedProjects={executeProjects}
         accountName={executeAccount}
-        usedModuleName={executeUsedModule}
+        projectGroupName={executeProjectGroup}
         onClose={() => setExecuteModalOpen(false)}
         onExecute={handleExecuteSelected}
         onProjectSelectionChange={setExecuteProjects}

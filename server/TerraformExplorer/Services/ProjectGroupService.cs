@@ -5,12 +5,12 @@ using TerraformExplorer.Settings;
 
 namespace TerraformExplorer.Services;
 
-public class UsedModuleService
+public class ProjectGroupService
 {
     private readonly FileSystemService _fileSystemService;
     private readonly TerraformSettings _terraformSettings;
 
-    public UsedModuleService(
+    public ProjectGroupService(
         FileSystemService fileSystemService, 
         TerraformSettings terraformSettings)
     {
@@ -18,13 +18,13 @@ public class UsedModuleService
         _terraformSettings = terraformSettings;
     }
     
-    public void CopyUsedModule(UsedModuleCopyRequest request)
+    public void CopyProjectGroup(ProjectGroupCopyRequest request)
     {
         var source = request.Source;
         var destination = request.Destination;
         
-        var sourcePath = GetPath(source.AccountName, source.ModuleName);
-        var destPath = GetPath(destination.AccountName, destination.ModuleName);;
+        var sourcePath = GetPath(source.AccountName, source.GroupName);
+        var destPath = GetPath(destination.AccountName, destination.GroupName);;
 
         _fileSystemService.CopyDirectory(sourcePath, destPath);
     }

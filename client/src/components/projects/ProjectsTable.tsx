@@ -25,43 +25,43 @@ export function ProjectsTable() {
   const modules = structure?.modules ?? [];
 
   const [selectedAccount, setSelectedAccount] = useState("");
-  const [selectedUsedModule, setSelectedUsedModule] = useState("");
+  const [selectedProjectGroup, setSelectedProjectGroup] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [showRenameDialog, setShowRenameDialog] = useState(false);
   const [renamingProjectName, setRenamingProjectName] = useState<string | null>(null);
   const [showCopyDialog, setShowCopyDialog] = useState(false);
-  const [copySource, setCopySource] = useState<{ accountName: string; usedModuleName: string; projectName: string } | null>(null);
+  const [copySource, setCopySource] = useState<{ accountName: string; projectGroupName: string; projectName: string } | null>(null);
 
   const { execute: deleteProject, loading: deleting } = useServiceHook(
     ([accountName, moduleName, projectName]: [string, string, string]) =>
       ProjectService.delete(accountName, moduleName, projectName)
   );
 
-  const usedModules = !selectedAccount ? [] : accounts.find(acc => acc.name === selectedAccount)?.usedModules ?? [];
+  const projectGroups = !selectedAccount ? [] : accounts.find(acc => acc.name === selectedAccount)?.projectGroups ?? [];
 
   const projects =
-    !selectedAccount || !selectedUsedModule
+    !selectedAccount || !selectedProjectGroup
       ? []
       : accounts
         .find(acc => acc.name === selectedAccount)
-        ?.usedModules.find(mod => mod.name === selectedUsedModule)
+        ?.projectGroups.find(mod => mod.name === selectedProjectGroup)
         ?.projects ?? [];
 
   const handleAccountChange = (value: string) => {
     setSelectedAccount(value);
-    setSelectedUsedModule("");
+    setSelectedProjectGroup("");
   };
 
-  const handleUsedModuleChange = (value: string) => setSelectedUsedModule(value);
+  const handleProjectGroupChange = (value: string) => setSelectedProjectGroup(value);
 
   const openCreateDialog = () => {
     if (!selectedAccount) {
       toast.error("Selecione uma conta primeiro");
       return;
     }
-    if (!selectedUsedModule) {
+    if (!selectedProjectGroup) {
       toast.error("Selecione um used module primeiro");
       return;
     }
@@ -90,8 +90,8 @@ export function ProjectsTable() {
     loadStructure();
   };
 
-  const openCopyDialog = (accountName: string, usedModuleName: string, projectName: string) => {
-    setCopySource({ accountName, usedModuleName, projectName });
+  const openCopyDialog = (accountName: string, projectGroupName: string, projectName: string) => {
+    setCopySource({ accountName, projectGroupName: projectGroupName, projectName });
     setShowCopyDialog(true);
   };
 
@@ -116,9 +116,9 @@ export function ProjectsTable() {
   };
 
   const handleDelete = async () => {
-    if (!projectToDelete || !selectedAccount || !selectedUsedModule) return;
+    if (!projectToDelete || !selectedAccount || !selectedProjectGroup) return;
 
-    await deleteProject([selectedAccount, selectedUsedModule, projectToDelete]);
+    await deleteProject([selectedAccount, selectedProjectGroup, projectToDelete]);
     toast.success(`Projeto "${projectToDelete}" excluído com sucesso`);
     closeDeleteConfirm();
     loadStructure();
@@ -131,7 +131,7 @@ export function ProjectsTable() {
         <Button
           onClick={openCreateDialog}
           className="bg-green-600 hover:bg-green-700 text-white"
-          disabled={!selectedAccount || !selectedUsedModule}
+          disabled={!selectedAccount || !selectedProjectGroup}
         >
           <Plus className="w-4 h-4 mr-2" /> Adicionar
         </Button>
@@ -151,9 +151,9 @@ export function ProjectsTable() {
         <div className="w-64">
           <FormSelect
             label="Filtrar por used module"
-            value={selectedUsedModule}
-            onValueChange={handleUsedModuleChange}
-            options={usedModules.map(mod => ({ value: mod.name, label: mod.name }))}
+            value={selectedProjectGroup}
+            onValueChange={handleProjectGroupChange}
+            options={projectGroups.map(mod => ({ value: mod.name, label: mod.name }))}
             placeholder="Selecione o used module"
             disabled={!selectedAccount}
           />
@@ -175,7 +175,7 @@ export function ProjectsTable() {
                   Selecione uma conta para visualizar os projetos
                 </TableCell>
               </TableRow>
-            ) : !selectedUsedModule ? (
+            ) : !selectedProjectGroup ? (
               <TableRow>
                 <TableCell colSpan={2} className="text-center text-slate-500 py-8">
                   Selecione um used module para visualizar os projetos
@@ -205,7 +205,7 @@ export function ProjectsTable() {
                       variant="ghost"
                       size="icon"
                       title="Copiar projeto"
-                      onClick={() => openCopyDialog(selectedAccount, selectedUsedModule, project.name)}
+                      onClick={() => openCopyDialog(selectedAccount, selectedProjectGroup, project.name)}
                       className="bg-blue-600 text-white hover:bg-blue-700"
                     >
                       <CopyIcon className="w-4 h-4" />
@@ -243,7 +243,7 @@ export function ProjectsTable() {
         open={showCreate}
         onClose={closeCreateDialog}
         accountName={selectedAccount}
-        usedModuleName={selectedUsedModule}
+        projectGroupName={selectedProjectGroup}
         accounts={accounts}
         modules={modules}
         onCreateSuccess={handleCreateSuccess}
@@ -253,7 +253,7 @@ export function ProjectsTable() {
         open={showCopyDialog}
         onClose={closeCopyDialog}
         accountName={copySource?.accountName ?? ""}
-        usedModuleName={copySource?.usedModuleName ?? ""}
+        projectGroupName={copySource?.projectGroupName ?? ""}
         projectName={copySource?.projectName ?? ""}
         accounts={accounts}
         onCopySuccess={handleCopySuccess}
@@ -263,7 +263,7 @@ export function ProjectsTable() {
         open={showRenameDialog}
         onClose={closeRenameDialog}
         accountName={selectedAccount}
-        usedModuleName={selectedUsedModule}
+        projectGroupName={selectedProjectGroup}
         projectName={renamingProjectName ?? ""}
         onRenameSuccess={handleRenameSuccess}
       />

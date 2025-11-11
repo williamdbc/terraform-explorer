@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useServiceHook } from "@/hooks/useServiceHook";
-import { UsedModuleService } from "@/services/UsedModuleService";
+import { ProjectGroupService } from "@/services/ProjectGroupService";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
 import { FormInput } from "@/components/form/FormInput";
 import { FormSelect } from "@/components/form/FormSelect";
@@ -17,7 +17,7 @@ import type { RenameRequest } from "@/interfaces/requests/RenameRequest";
 import type { Account } from "@/interfaces/TerraformStructure";
 import { DialogFooterButtons } from "@/components/dialogs/DialogFooterButtons";
 
-interface UsedModuleCreateEditDialogProps {
+interface ProjectGroupCreateEditDialogProps {
   open: boolean;
   onClose: () => void;
   mode: "create" | "edit";
@@ -28,7 +28,7 @@ interface UsedModuleCreateEditDialogProps {
   onEditSuccess?: () => void;
 }
 
-export function UsedModuleCreateEditDialog({
+export function ProjectGroupCreateEditDialog({
   open,
   onClose,
   mode,
@@ -37,17 +37,17 @@ export function UsedModuleCreateEditDialog({
   accounts,
   onCreateSuccess,
   onEditSuccess,
-}: UsedModuleCreateEditDialogProps) {
+}: ProjectGroupCreateEditDialogProps) {
   const [moduleName, setModuleName] = useState(mode === "create" ? "" : initialName);
   const [selectedAccount, setSelectedAccount] = useState(accountName);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { execute: createModule, loading: loadingCreate } = useServiceHook(
-    ([accName, req]: [string, CreateItemRequest]) => UsedModuleService.create(accName, req)
+    ([accName, req]: [string, CreateItemRequest]) => ProjectGroupService.create(accName, req)
   );
 
   const { execute: renameModule, loading: loadingRename } = useServiceHook(
-    ([accName, oldName, renameReq]: [string, string, RenameRequest]) => UsedModuleService.rename(accName, oldName, renameReq)
+    ([accName, oldName, renameReq]: [string, string, RenameRequest]) => ProjectGroupService.rename(accName, oldName, renameReq)
   );
 
   const loading = mode === "create" ? loadingCreate : loadingRename;

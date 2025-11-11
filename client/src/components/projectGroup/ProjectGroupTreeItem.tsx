@@ -1,24 +1,24 @@
 import { ProjectExplorerItem } from "@/components/projects/ProjectExplorerItem";
 import { SelectedType } from "@/enums/SelectedType";
-import type { UsedModule } from "@/interfaces/TerraformStructure";
+import type { ProjectGroup } from "@/interfaces/TerraformStructure";
 import { cn } from "@/lib/utils";
 import { ChevronRight, FolderOpen, Folder } from "lucide-react";
 
-interface UsedModuleTreeItemProps {
-  usedModule: UsedModule;
+interface ProjectGroupTreeItemProps {
+  projectGroup: ProjectGroup;
   expanded: boolean;
   onToggle: () => void;
   selectedPath: string | null;
   onSelect: (path: string, type: SelectedType) => void;
 }
 
-export function UsedModuleTreeItem({
-  usedModule,
+export function ProjectGroupTreeItem({
+  projectGroup,
   expanded,
   onToggle,
   selectedPath,
   onSelect,
-}: UsedModuleTreeItemProps) {
+}: ProjectGroupTreeItemProps) {
   return (
     <div className="select-none">
       <button
@@ -39,13 +39,13 @@ export function UsedModuleTreeItem({
         ) : (
           <Folder className="w-4 h-4 text-amber-600" />
         )}
-        <span className="text-slate-800 truncate">{usedModule.name}</span>
-        <span className="ml-auto text-xs text-slate-500">{usedModule.projects.length}</span>
+        <span className="text-slate-800 truncate">{projectGroup.name}</span>
+        <span className="ml-auto text-xs text-slate-500">{projectGroup.projects.length}</span>
       </button>
 
       {expanded && (
         <div className="ml-4">
-          {usedModule.projects.map(project => (
+          {projectGroup.projects.map(project => (
             <ProjectExplorerItem
               key={project.path}
               project={project}

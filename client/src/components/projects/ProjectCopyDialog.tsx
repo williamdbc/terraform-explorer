@@ -20,7 +20,7 @@ interface ProjectCopyDialogProps {
   open: boolean;
   onClose: () => void;
   accountName: string;
-  usedModuleName: string;
+  projectGroupName: string;
   projectName: string;
   accounts: Account[];
   onCopySuccess?: () => void;
@@ -30,14 +30,14 @@ export function ProjectCopyDialog({
   open,
   onClose,
   accountName,
-  usedModuleName,
+  projectGroupName,
   projectName,
   accounts,
   onCopySuccess,
 }: ProjectCopyDialogProps) {
   const initialFormData: ProjectCopyRequest = {
-    source: { accountName, moduleName: usedModuleName, projectName },
-    destination: { accountName, moduleName: usedModuleName, projectName: "" },
+    source: { accountName, moduleName: projectGroupName, projectName },
+    destination: { accountName, moduleName: projectGroupName, projectName: "" },
   };
 
   const [formData, setFormData] = useState<ProjectCopyRequest>(initialFormData);
@@ -50,7 +50,7 @@ export function ProjectCopyDialog({
   useEffect(() => {
     setFormData(initialFormData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountName, usedModuleName, projectName]);
+  }, [accountName, projectGroupName, projectName]);
 
   const updateSourceField = (field: keyof ProjectCopyRequest["source"], value: string) => {
     setFormData(prev => ({
@@ -122,13 +122,13 @@ export function ProjectCopyDialog({
   };
 
   const destinationAccountOptions = accounts.map(acc => ({ value: acc.name, label: acc.name }));
-  const destinationUsedModules =
-    accounts.find(a => a.name === formData.destination.accountName)?.usedModules ?? [];
-  const destinationModuleOptions = destinationUsedModules.map(mod => ({ value: mod.name, label: mod.name }));
+  const destinationProjectGroups =
+    accounts.find(a => a.name === formData.destination.accountName)?.projectGroups ?? [];
+  const destinationModuleOptions = destinationProjectGroups.map(mod => ({ value: mod.name, label: mod.name }));
   const sourceProjectOptions =
     accounts
       .find(a => a.name === formData.source.accountName)
-      ?.usedModules.find(m => m.name === formData.source.moduleName)
+      ?.projectGroups.find(m => m.name === formData.source.moduleName)
       ?.projects.map(p => ({ value: p.name, label: p.name })) ?? [];
 
   if (!open) return null;

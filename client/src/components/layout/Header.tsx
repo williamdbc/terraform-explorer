@@ -42,7 +42,7 @@ export function Header({ setActiveView }: HeaderProps) {
           text="Used Modules"
           bgColorClass="bg-blue-600 hover:bg-blue-700"
           ariaLabel="Used Modules"
-          onClick={() => setActiveView("usedModules")}
+          onClick={() => setActiveView("projectGroups")}
           icon={<FaCubes className="w-5 h-5" />}
         />
         <ButtonWithTooltip
