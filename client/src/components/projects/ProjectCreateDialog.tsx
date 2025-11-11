@@ -19,7 +19,7 @@ interface ProjectCreateDialogProps {
   open: boolean;
   onClose: () => void;
   accountName: string;
-  usedModuleName: string;
+  projectGroupName: string;
   accounts: Account[];
   modules: TerraformModule[];
   onCreateSuccess?: () => void;
@@ -29,14 +29,14 @@ export function ProjectCreateDialog({
   open,
   onClose,
   accountName,
-  usedModuleName,
+  projectGroupName,
   accounts,
   modules,
   onCreateSuccess,
 }: ProjectCreateDialogProps) {
   const initialFormData: CreateProjectRequest = {
     accountName,
-    usedModuleName,
+    projectGroupName,
     moduleName: "",
     projectName: "",
   };
@@ -51,13 +51,13 @@ export function ProjectCreateDialog({
   useEffect(() => {
     setFormData(initialFormData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountName, usedModuleName]);
+  }, [accountName, projectGroupName]);
 
   const accountOptions = accounts.map(acc => ({ value: acc.name, label: acc.name }));
 
-  const usedModuleOptions = (() => {
+  const projectGroupOptions = (() => {
     const account = accounts.find(acc => acc.name === formData.accountName);
-    return account?.usedModules.map(mod => ({ value: mod.name, label: mod.name })) ?? [];
+    return account?.projectGroups.map(mod => ({ value: mod.name, label: mod.name })) ?? [];
   })();
 
   const moduleOptions = modules.map(mod => ({ value: mod.name, label: mod.name }));
@@ -68,11 +68,11 @@ export function ProjectCreateDialog({
 
   const handleAccountChange = (value: string) => {
     updateField("accountName", value);
-    updateField("usedModuleName", "");
+    updateField("projectGroupName", "");
   };
 
-  const handleUsedModuleChange = (value: string) => {
-    updateField("usedModuleName", value);
+  const handleProjectGroupChange = (value: string) => {
+    updateField("projectGroupName", value);
   };
 
   const handleModuleChange = (value: string) => {
@@ -88,8 +88,8 @@ export function ProjectCreateDialog({
       toast.error("Conta é obrigatória");
       return false;
     }
-    if (!formData.usedModuleName.trim()) {
-      toast.error("Used Module é obrigatório");
+    if (!formData.projectGroupName.trim()) {
+      toast.error("Grupo de projetos é obrigatório");
       return false;
     }
     if (!formData.moduleName.trim()) {
@@ -114,7 +114,7 @@ export function ProjectCreateDialog({
 
     await createProject({
       accountName: formData.accountName.trim(),
-      usedModuleName: formData.usedModuleName.trim(),
+      projectGroupName: formData.projectGroupName.trim(),
       moduleName: formData.moduleName.trim(),
       projectName: formData.projectName.trim(),
     });
@@ -135,7 +135,7 @@ export function ProjectCreateDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Novo Projeto</DialogTitle>
+            <DialogTitle>Novo projeto</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -148,10 +148,10 @@ export function ProjectCreateDialog({
             />
 
             <FormSelect
-              label="Used Module"
-              value={formData.usedModuleName}
-              onValueChange={handleUsedModuleChange}
-              options={usedModuleOptions}
+              label="Grupo de projetos"
+              value={formData.projectGroupName}
+              onValueChange={handleProjectGroupChange}
+              options={projectGroupOptions}
               disabled={loading || !formData.accountName}
             />
 

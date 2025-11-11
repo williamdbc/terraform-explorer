@@ -15,10 +15,9 @@ public class Account
     public string Name { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
     public string? AwsProfile { get; set; }
-    public string? SourceProfile { get; set; }
     public string? AssumeRoleArn { get; set; }
     public string? Region { get; set; }
-    public List<UsedModule> UsedModules { get; set; } = new();
+    public List<ProjectGroup> ProjectGroups { get; set; } = new();
 }
 
 public class Provider
@@ -33,7 +32,7 @@ public class TerraformModule
     public List<TerraformFile> Files { get; set; } = new();
 }
 
-public class UsedModule
+public class ProjectGroup
 {
     public string Name { get; set; }
     public string Path { get; set; }

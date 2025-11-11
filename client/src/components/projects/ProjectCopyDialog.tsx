@@ -20,7 +20,7 @@ interface ProjectCopyDialogProps {
   open: boolean;
   onClose: () => void;
   accountName: string;
-  usedModuleName: string;
+  projectGroupName: string;
   projectName: string;
   accounts: Account[];
   onCopySuccess?: () => void;
@@ -30,14 +30,14 @@ export function ProjectCopyDialog({
   open,
   onClose,
   accountName,
-  usedModuleName,
+  projectGroupName,
   projectName,
   accounts,
   onCopySuccess,
 }: ProjectCopyDialogProps) {
   const initialFormData: ProjectCopyRequest = {
-    source: { accountName, moduleName: usedModuleName, projectName },
-    destination: { accountName, moduleName: usedModuleName, projectName: "" },
+    source: { accountName, moduleName: projectGroupName, projectName },
+    destination: { accountName, moduleName: projectGroupName, projectName: "" },
   };
 
   const [formData, setFormData] = useState<ProjectCopyRequest>(initialFormData);
@@ -50,7 +50,7 @@ export function ProjectCopyDialog({
   useEffect(() => {
     setFormData(initialFormData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountName, usedModuleName, projectName]);
+  }, [accountName, projectGroupName, projectName]);
 
   const updateSourceField = (field: keyof ProjectCopyRequest["source"], value: string) => {
     setFormData(prev => ({
@@ -91,7 +91,7 @@ export function ProjectCopyDialog({
       return false;
     }
     if (!formData.destination.moduleName.trim()) {
-      toast.error("Used module destino é obrigatório");
+      toast.error("Grupo de projetos de destino é obrigatório");
       return false;
     }
     if (!formData.destination.projectName.trim()) {
@@ -122,13 +122,13 @@ export function ProjectCopyDialog({
   };
 
   const destinationAccountOptions = accounts.map(acc => ({ value: acc.name, label: acc.name }));
-  const destinationUsedModules =
-    accounts.find(a => a.name === formData.destination.accountName)?.usedModules ?? [];
-  const destinationModuleOptions = destinationUsedModules.map(mod => ({ value: mod.name, label: mod.name }));
+  const destinationProjectGroups =
+    accounts.find(a => a.name === formData.destination.accountName)?.projectGroups ?? [];
+  const destinationModuleOptions = destinationProjectGroups.map(mod => ({ value: mod.name, label: mod.name }));
   const sourceProjectOptions =
     accounts
       .find(a => a.name === formData.source.accountName)
-      ?.usedModules.find(m => m.name === formData.source.moduleName)
+      ?.projectGroups.find(m => m.name === formData.source.moduleName)
       ?.projects.map(p => ({ value: p.name, label: p.name })) ?? [];
 
   if (!open) return null;
@@ -138,12 +138,12 @@ export function ProjectCopyDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Copiar Projeto</DialogTitle>
+            <DialogTitle>Copiar projeto</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
             <FormSelect
-              label="Conta Destino"
+              label="Conta destino"
               value={formData.destination.accountName}
               onValueChange={handleDestAccountChange}
               options={destinationAccountOptions}
@@ -152,7 +152,7 @@ export function ProjectCopyDialog({
             />
 
             <FormSelect
-              label="Used Module Destino"
+              label="Grupo de projetos de destino"
               value={formData.destination.moduleName}
               onValueChange={handleDestModuleChange}
               options={destinationModuleOptions}
@@ -161,7 +161,7 @@ export function ProjectCopyDialog({
             />
 
             <FormSelect
-              label="Projeto Origem"
+              label="Projeto origem"
               value={formData.source.projectName}
               onValueChange={handleSourceProjectChange}
               options={sourceProjectOptions}
@@ -171,7 +171,7 @@ export function ProjectCopyDialog({
 
             <FormInput
               id="dest-project-name"
-              label="Nome do Projeto Destino"
+              label="Nome do projeto destino"
               value={formData.destination.projectName}
               onChange={handleDestProjectNameChange}
               placeholder="Nome para o novo projeto"

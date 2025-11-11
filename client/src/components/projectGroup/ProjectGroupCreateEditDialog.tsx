@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useServiceHook } from "@/hooks/useServiceHook";
-import { UsedModuleService } from "@/services/UsedModuleService";
+import { ProjectGroupService } from "@/services/ProjectGroupService";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
 import { FormInput } from "@/components/form/FormInput";
 import { FormSelect } from "@/components/form/FormSelect";
@@ -17,7 +17,7 @@ import type { RenameRequest } from "@/interfaces/requests/RenameRequest";
 import type { Account } from "@/interfaces/TerraformStructure";
 import { DialogFooterButtons } from "@/components/dialogs/DialogFooterButtons";
 
-interface UsedModuleCreateEditDialogProps {
+interface ProjectGroupCreateEditDialogProps {
   open: boolean;
   onClose: () => void;
   mode: "create" | "edit";
@@ -28,7 +28,7 @@ interface UsedModuleCreateEditDialogProps {
   onEditSuccess?: () => void;
 }
 
-export function UsedModuleCreateEditDialog({
+export function ProjectGroupCreateEditDialog({
   open,
   onClose,
   mode,
@@ -37,17 +37,17 @@ export function UsedModuleCreateEditDialog({
   accounts,
   onCreateSuccess,
   onEditSuccess,
-}: UsedModuleCreateEditDialogProps) {
+}: ProjectGroupCreateEditDialogProps) {
   const [moduleName, setModuleName] = useState(mode === "create" ? "" : initialName);
   const [selectedAccount, setSelectedAccount] = useState(accountName);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { execute: createModule, loading: loadingCreate } = useServiceHook(
-    ([accName, req]: [string, CreateItemRequest]) => UsedModuleService.create(accName, req)
+    ([accName, req]: [string, CreateItemRequest]) => ProjectGroupService.create(accName, req)
   );
 
   const { execute: renameModule, loading: loadingRename } = useServiceHook(
-    ([accName, oldName, renameReq]: [string, string, RenameRequest]) => UsedModuleService.rename(accName, oldName, renameReq)
+    ([accName, oldName, renameReq]: [string, string, RenameRequest]) => ProjectGroupService.rename(accName, oldName, renameReq)
   );
 
   const loading = mode === "create" ? loadingCreate : loadingRename;
@@ -86,11 +86,11 @@ export function UsedModuleCreateEditDialog({
 
     if (mode === "create") {
       await createModule([selectedAccount, { name: moduleName.trim() }]);
-      toast.success("Used Module criado com sucesso");
+      toast.success("Grupo de projetos criado com sucesso");
       onCreateSuccess?.();
     } else {
       await renameModule([accountName, initialName, { newName: moduleName.trim() }]);
-      toast.success("Used Module renomeado com sucesso");
+      toast.success("Grupo de projetos renomeado com sucesso");
       onEditSuccess?.();
     }
     onClose();
@@ -104,7 +104,7 @@ export function UsedModuleCreateEditDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{mode === "create" ? "Novo Used Module" : "Editar Used Module"}</DialogTitle>
+            <DialogTitle>{mode === "create" ? "Novo grupo de projetos" : "Editar grupo de projetos"}</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -141,10 +141,10 @@ export function UsedModuleCreateEditDialog({
         open={confirmOpen}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirm}
-        title={mode === "create" ? "Novo Used Module" : "Editar Used Module"}
+        title={mode === "create" ? "Novo grupo de projetos" : "Editar grupo de projetos"}
         description={mode === "create"
-          ? `Deseja realmente criar o used module "${moduleName.trim()}" na conta "${selectedAccount}"?`
-          : `Deseja renomear o used module para "${moduleName.trim()}"?`}
+          ? `Deseja realmente criar o grupo de projetos "${moduleName.trim()}" na conta "${selectedAccount}"?`
+          : `Deseja renomear o grupo de projetos para "${moduleName.trim()}"?`}
         cancelText="Cancelar"
         confirmText={mode === "create" ? "Criar" : "Salvar"}
         type={mode === "create" ? "create" : "edit"}

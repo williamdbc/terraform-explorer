@@ -30,7 +30,7 @@ export function TerraformActions({
         {!hasMainTf && hasFiles && (
           <div className="flex items-center gap-2 text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">
             <AlertTriangle className="w-4 h-4" />
-            <span className="text-sm font-medium">No main.tf</span>
+            <span className="text-sm font-medium">Não há main.tf</span>
           </div>
         )}
       </div>
@@ -68,7 +68,7 @@ export function TerraformActions({
       {executing && (
         <div className="flex items-center justify-center gap-2 text-blue-700 mt-4 pt-3 border-t border-slate-200">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
-          <span className="text-sm font-medium">Executing command...</span>
+          <span className="text-sm font-medium">Executando comando..</span>
         </div>
       )}
     </div>

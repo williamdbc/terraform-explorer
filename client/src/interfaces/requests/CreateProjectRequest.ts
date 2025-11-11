@@ -1,6 +1,6 @@
 export interface CreateProjectRequest {
   accountName: string;
-  usedModuleName: string;
+  projectGroupName: string;
   moduleName: string;
   projectName: string;
 }

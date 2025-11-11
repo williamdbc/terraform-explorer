@@ -16,7 +16,7 @@ export function FileEditorStatusBar({
       <div>Ln {caret.line}, Col {caret.column}</div>
       <div>{charCount} chars • {byteSize} bytes</div>
       <div className={modified ? "text-amber-400" : "text-green-400"}>
-        {modified ? "Modified" : "Saved"}
+        {modified ? "Modificado" : "Salvo"}
       </div>
     </div>
   );

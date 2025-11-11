@@ -45,7 +45,7 @@ public class AccountService
     public ItemResponse Get(string name)
     {
         var path = GetPath(name);
-        _fileSystemService.EnsureExists(path, "Account");
+        _fileSystemService.EnsureExists(path, "Conta");
         return new ItemResponse { Name = name, Path = path };
     }
 
@@ -72,7 +72,7 @@ public class AccountService
     {
         var structure = TerraformStructureLoader.Load(_terraformSettings);
         var account = structure.Accounts.FirstOrDefault(a => a.Name == accountName)
-                      ?? throw new NotFoundException($"Account {accountName} not found.");
+                      ?? throw new NotFoundException($"Conta {accountName} não encontrada.");
         
         account.AwsProfile = request.Profile;
         account.AssumeRoleArn = request.RoleArn;

@@ -39,11 +39,10 @@ export function TerraformContent({
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         <Layers className="w-16 h-16 text-slate-300 mb-4" />
         <h2 className="text-xl font-semibold text-slate-900 mb-2">
-          Select a Module or Project
+          Selecione um Módulo ou Projeto
         </h2>
         <p className="text-slate-600 max-w-md px-4">
-          Choose a Terraform module or project from the directory tree to view
-          details and execute commands
+          Escolha um módulo ou projeto Terraform na árvore de diretórios para ver detalhes e executar comandos
         </p>
       </div>
     );

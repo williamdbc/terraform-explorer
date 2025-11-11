@@ -24,12 +24,12 @@ export function ModuleFiles({
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
-            New File
+            Novo arquivo
           </Button>
         </div>
 
         {files.length === 0 ? (
-          <p className="text-sm text-slate-500">No files</p>
+          <p className="text-sm text-slate-500">Não há arquivos</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
             {files.map((file) => (

@@ -1,1 +1,1 @@
-export type AppView = "content" | "modules" | "accounts" | "providers" | "projects" | "usedModules";
+export type AppView = "content" | "modules" | "accounts" | "providers" | "projects" | "projectGroups";

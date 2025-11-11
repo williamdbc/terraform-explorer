@@ -27,7 +27,7 @@ export function TerminalTabs({
           {tabs.length === 0 ? (
             <div className="flex items-center gap-2 text-slate-400">
               <Terminal className="w-4 h-4 shrink-0" />
-              <span className="text-xs">No output</span>
+              <span className="text-xs">Nenhuma saída</span>
             </div>
           ) : (
             tabs.map((tab) => (

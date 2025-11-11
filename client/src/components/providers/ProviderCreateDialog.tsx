@@ -91,7 +91,7 @@ export function ProviderCreateDialog({
       <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Novo Provider AWS</DialogTitle>
+            <DialogTitle>Novo provider AWS</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -107,6 +107,7 @@ export function ProviderCreateDialog({
             <FormInput
               id="access-key-input"
               label="Access Key ID"
+              type="password"
               value={formData.accessKeyId}
               onChange={(e) => handleChange("accessKeyId", e.target.value)}
               placeholder="AKIAIOSFODNN7EXAMPLE"

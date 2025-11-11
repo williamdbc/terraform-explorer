@@ -11,15 +11,15 @@ public class ModuleService
     private readonly TerraformSettings _terraformSettings;
 
     public ModuleService(
-        TerraformService terraformService, 
-        FileSystemService fileSystemService, 
+        TerraformService terraformService,
+        FileSystemService fileSystemService,
         TerraformSettings terraformSettings)
     {
         _terraformService = terraformService;
         _fileSystemService = fileSystemService;
         _terraformSettings = terraformSettings;
     }
-    
+
     private string GetPath(string name)
     {
         return Path.Combine(_terraformSettings.GetModulesPath(), name);
@@ -28,7 +28,7 @@ public class ModuleService
     public List<ItemResponse> List()
     {
         var modules = _terraformService.GetStructure().Modules;
-        return modules.Select(module => new ItemResponse{ Name = module.Name, Path = module.Path }).ToList();
+        return modules.Select(module => new ItemResponse { Name = module.Name, Path = module.Path }).ToList();
     }
 
     public ItemResponse Get(string name)
@@ -50,59 +50,58 @@ public class ModuleService
         _fileSystemService.DeleteDirectory(path);
     }
 
-public void Rename(string oldName, string newName)
-{
-    if (string.IsNullOrWhiteSpace(newName))
-        throw new ArgumentException("O novo nome do módulo não pode ser vazio.");
-
-    if (oldName == newName)
-        throw new InvalidOperationException("O novo nome é igual ao atual.");
-
-    var oldPath = GetPath(oldName);
-    var newPath = GetPath(newName);
-
-    _fileSystemService.EnsureExists(oldPath, "Módulo");
-
-    if (Directory.Exists(newPath))
-        throw new InvalidOperationException($"Já existe um módulo com o nome '{newName}'.");
-    
-    _fileSystemService.Rename(oldPath, newPath);
-    
-    UpdateModuleReferencesInProjects(oldName, newName);
-}
-
-private void UpdateModuleReferencesInProjects(string oldModuleName, string newModuleName)
-{
-    var structure = _terraformService.GetStructure();
-    var accountsPath = _terraformSettings.GetAccountsPath();
-
-    if (!Directory.Exists(accountsPath)) return;
-
-    var oldSourcePattern = $"../../../../modules/{oldModuleName}";
-    var newSourcePattern = $"../../../../modules/{newModuleName}";
-
-    foreach (var account in structure.Accounts)
+    public void Rename(string oldName, string newName)
     {
-        foreach (var usedModule in account.UsedModules)
+        if (string.IsNullOrWhiteSpace(newName))
+            throw new ArgumentException("O novo nome do módulo não pode ser vazio.");
+
+        if (oldName == newName)
+            throw new InvalidOperationException("O novo nome é igual ao atual.");
+
+        var oldPath = GetPath(oldName);
+        var newPath = GetPath(newName);
+
+        _fileSystemService.EnsureExists(oldPath, "Módulo");
+
+        if (Directory.Exists(newPath))
+            throw new InvalidOperationException($"Já existe um módulo com o nome '{newName}'.");
+
+        _fileSystemService.Rename(oldPath, newPath);
+
+        UpdateModuleReferencesInProjects(oldName, newName);
+    }
+
+    private void UpdateModuleReferencesInProjects(string oldModuleName, string newModuleName)
+    {
+        var structure = _terraformService.GetStructure();
+        var accountsPath = _terraformSettings.GetAccountsPath();
+
+        if (!Directory.Exists(accountsPath)) return;
+
+        var oldSourcePattern = $"../../../../modules/{oldModuleName}";
+        var newSourcePattern = $"../../../../modules/{newModuleName}";
+
+        foreach (var account in structure.Accounts)
         {
-            var projectsPath = usedModule.Path;
-            if (!Directory.Exists(projectsPath)) continue;
-
-            foreach (var projectDir in Directory.GetDirectories(projectsPath))
+            foreach (var projectGroup in account.ProjectGroups)
             {
-                var mainTfPath = Path.Combine(projectDir, "main.tf");
-                if (!File.Exists(mainTfPath)) continue;
+                var projectsPath = projectGroup.Path;
+                if (!Directory.Exists(projectsPath)) continue;
 
-                var content = File.ReadAllText(mainTfPath);
-
-                if (content.Contains(oldSourcePattern))
+                foreach (var projectDir in Directory.GetDirectories(projectsPath))
                 {
-                    var updatedContent = content.Replace(oldSourcePattern, newSourcePattern);
-                    File.WriteAllText(mainTfPath, updatedContent);
+                    var mainTfPath = Path.Combine(projectDir, "main.tf");
+                    if (!File.Exists(mainTfPath)) continue;
+
+                    var content = File.ReadAllText(mainTfPath);
+
+                    if (content.Contains(oldSourcePattern))
+                    {
+                        var updatedContent = content.Replace(oldSourcePattern, newSourcePattern);
+                        File.WriteAllText(mainTfPath, updatedContent);
+                    }
                 }
             }
         }
     }
-}
-    
 }

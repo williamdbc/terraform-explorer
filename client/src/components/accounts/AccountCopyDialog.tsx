@@ -33,7 +33,7 @@ export function AccountCopyDialog({
   const initialFormData: AccountCopyRequest = {
     sourceAccountName: accounts[0]?.name ?? "",
     destinationAccountName: "",
-    copyUsedModules: true,
+    copyProjectGroups: true,
   };
 
   const [formData, setFormData] = useState<AccountCopyRequest>(initialFormData);
@@ -60,8 +60,8 @@ export function AccountCopyDialog({
     updateField("destinationAccountName", e.target.value);
   };
 
-  const handleCopyUsedModulesChange = (checked: boolean) => {
-    updateField("copyUsedModules", checked);
+  const handleCopyProjectGroupChange = (checked: boolean) => {
+    updateField("copyProjectGroups", checked);
   };
 
   const validateForm = (): boolean => {
@@ -103,12 +103,12 @@ export function AccountCopyDialog({
       <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Copiar Conta</DialogTitle>
+            <DialogTitle>Copiar conta</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
             <FormSelect
-              label="Conta de Origem"
+              label="Conta de origem"
               value={formData.sourceAccountName}
               onValueChange={handleSourceAccountChange}
               options={accountOptions}
@@ -117,7 +117,7 @@ export function AccountCopyDialog({
 
             <FormInput
               id="dest-account-name"
-              label="Nome da Nova Conta"
+              label="Nome da nova conta"
               value={formData.destinationAccountName}
               onChange={handleDestAccountNameChange}
               placeholder="nome-da-nova-conta"
@@ -126,13 +126,13 @@ export function AccountCopyDialog({
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="copyUsedModules"
-                checked={formData.copyUsedModules}
-                onCheckedChange={handleCopyUsedModulesChange}
+                id="copyProjectGorup"
+                checked={formData.copyProjectGroups}
+                onCheckedChange={handleCopyProjectGroupChange}
                 disabled={loading}
               />
-              <label htmlFor="copyUsedModules" className="text-sm text-slate-700 select-none">
-                Copiar Used Modules também
+              <label htmlFor="copyProjectGorup" className="text-sm text-slate-700 select-none">
+                Copiar grupos de projetos
               </label>
             </div>
 

@@ -18,6 +18,6 @@ public static class ServicesConfig
         builder.Services.AddScoped<FileService>();
         builder.Services.AddScoped<FileSystemService>();
         builder.Services.AddScoped<ModuleService>();
-        builder.Services.AddScoped<UsedModuleService>();
+        builder.Services.AddScoped<ProjectGroupService>();
     }
 }

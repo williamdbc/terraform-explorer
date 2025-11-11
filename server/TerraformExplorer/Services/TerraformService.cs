@@ -30,5 +30,4 @@ public class TerraformService
         return await TerraformCommandExecutor.ExecuteAllAsync(request, _terraformSettings);
     }
     
-    
 }

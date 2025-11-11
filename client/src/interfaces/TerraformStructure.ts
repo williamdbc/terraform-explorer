@@ -10,7 +10,7 @@ export interface Project {
   files: TerraformFile[];
 }
 
-export interface UsedModule {
+export interface ProjectGroup {
   name: string;
   path: string;
   projects: Project[];
@@ -20,10 +20,9 @@ export interface Account {
   name: string;
   path: string;
   awsProfile?: string;
-  sourceProfile?: string;
   assumeRoleArn?: string;
   region?: string;
-  usedModules: UsedModule[];
+  projectGroups: ProjectGroup[];
 }
 
 export interface Provider {

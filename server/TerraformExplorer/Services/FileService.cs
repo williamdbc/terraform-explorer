@@ -21,7 +21,7 @@ public class FileService
 
     public void Delete(string path)
     {
-        _fileSystemService.EnsureExists(path, "Folder/file");
+        _fileSystemService.EnsureExists(path, "Pasta ou arquivo");
         _fileSystemService.DeleteFile(path);
     }
     
