@@ -29,9 +29,21 @@ public static class TerraformCommandExecutor
         if (validDirs.Count == 0)
             throw new ArgumentException("At least one valid WorkingDir is required.", nameof(request.WorkingDirs));
 
-        var tasks = validDirs
-            .Select(dir => ExecuteSingleAsync(request.Command, dir, settings))
-            .ToArray();
+        var maxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount);
+        var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
+        
+        var tasks = validDirs.Select(async dir =>
+        {
+            await semaphore.WaitAsync();
+            try
+            {
+                return await ExecuteSingleAsync(request.Command, dir, settings);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
 
         var results = await Task.WhenAll(tasks);
 
