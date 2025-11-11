@@ -18,7 +18,6 @@ jobs:
 
       - name: Subir containers (PROD)
         run: |
-          docker-compose down || true
           docker-compose up -d --build
 
   deploy-hml:
@@ -32,5 +31,4 @@ jobs:
 
       - name: Subir containers (HML)
         run: |
-          docker-compose down || true
           docker-compose up -d --build
