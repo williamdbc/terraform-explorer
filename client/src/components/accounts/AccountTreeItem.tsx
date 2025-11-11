@@ -3,7 +3,7 @@ import { ProjectGroupTreeItem } from "@/components/projectGroup/ProjectGroupTree
 import type { SelectedType } from "@/enums/SelectedType";
 import type { Account } from "@/interfaces/TerraformStructure";
 import { cn } from "@/lib/utils";
-import { ChevronRight, FolderOpen, Folder } from "lucide-react";
+import { ChevronRight, Cloud } from "lucide-react";
 
 interface AccountTreeItemProps {
   account: Account;
@@ -39,13 +39,12 @@ export function AccountTreeItem({
             expanded && "rotate-90"
           )}
         />
-        {expanded ? (
-          <FolderOpen className="w-4 h-4 text-blue-600" />
-        ) : (
-          <Folder className="w-4 h-4 text-blue-600" />
-        )}
+        <Cloud className={cn(
+          "w-4 h-4",
+          expanded ? "text-orange-400" : "text-orange-400 fill-orange-400"
+        )} />
         <span className="font-medium text-slate-900 truncate">{account.name}</span>
-        <span className="ml-auto text-xs text-slate-500">{account.projectGroups.length}</span>
+        <span className="ml-auto text-xs text-slate-500">{account.projectGroups?.length}</span>
       </button>
 
       {expanded && (

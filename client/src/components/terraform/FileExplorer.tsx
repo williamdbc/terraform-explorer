@@ -1,13 +1,13 @@
 import { useContext, useState } from "react";
 import { StructureContext } from "@/contexts/StructureContext";
 import {
-  FileCode,
   Server,
-  Box,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SelectedType } from "@/enums/SelectedType";
 import { AccountTreeItem } from "@/components/accounts/AccountTreeItem";
+import { FaCubes } from "react-icons/fa";
 
 interface FileExplorerProps {
   selectedPath: string | null;
@@ -40,8 +40,8 @@ export function FileExplorer({
 
           <div className="mb-4">
             <div className="flex items-center px-2 py-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-              <Server className="w-3.5 h-3.5 mr-1" />
-              AWS Accounts
+              <Server className="w-3.5 h-3.5 mr-1 text-amber-600" />
+              Contas AWS
             </div>
             {accounts.map(account => (
               <AccountTreeItem
@@ -59,8 +59,8 @@ export function FileExplorer({
 
           <div>
             <div className="flex items-center px-2 py-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-              <Box className="w-3.5 h-3.5 mr-1" />
-              Stack Modules
+              <Package className="w-3.5 h-3.5 mr-1 text-amber-600" />
+              Módulos de Infra
             </div>
             {modules.map(module => (
               <button
@@ -73,7 +73,7 @@ export function FileExplorer({
                     : "hover:bg-slate-200 text-slate-700"
                 )}
               >
-                <FileCode className="w-4 h-4 shrink-0" />
+                <FaCubes className="w-4 h-4 shrink-0 text-violet-600" />
                 <span className="truncate">{module.name}</span>
               </button>
             ))}

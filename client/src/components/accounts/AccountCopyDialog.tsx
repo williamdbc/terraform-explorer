@@ -132,7 +132,7 @@ export function AccountCopyDialog({
                 disabled={loading}
               />
               <label htmlFor="copyProjectGorup" className="text-sm text-slate-700 select-none">
-                Copiar Used Modules também
+                Copiar Grupos de Projeto
               </label>
             </div>
 

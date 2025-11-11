@@ -35,9 +35,9 @@ export function ProjectGroupTreeItem({
           )}
         />
         {expanded ? (
-          <FolderOpen className="w-4 h-4 text-amber-600" />
+          <FolderOpen className="w-4 h-4 text-purple-500" />
         ) : (
-          <Folder className="w-4 h-4 text-amber-600" />
+          <Folder className="w-4 h-4 text-purple-500 fill-purple-500" />
         )}
         <span className="text-slate-800 truncate">{projectGroup.name}</span>
         <span className="ml-auto text-xs text-slate-500">{projectGroup.projects.length}</span>

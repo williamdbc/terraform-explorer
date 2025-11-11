@@ -1,6 +1,6 @@
 import type { Project } from "@/interfaces/TerraformStructure";
 import { cn } from "@/lib/utils";
-import { FileCode } from "lucide-react";
+import { FaRocket } from "react-icons/fa";
 
 interface ProjectExplorerItemProps {
   project: Project;
@@ -17,7 +17,7 @@ export function ProjectExplorerItem({ project, selected, onSelect }: ProjectExpl
         selected ? "bg-blue-100 text-blue-900 font-medium" : "hover:bg-slate-200/70 text-slate-700"
       )}
     >
-      <FileCode className={cn("w-4 h-4", selected ? "text-blue-600" : "text-slate-500")} />
+      <FaRocket className={`w-4 h-4 ${selected ? "text-emerald-500" : "text-emerald-500"}`} />
       <span className="truncate">{project.name}</span>
     </button>
   );
