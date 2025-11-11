@@ -109,7 +109,7 @@ export function ProjectGroupTable() {
     if (!moduleToDelete || !selectedAccount) return;
 
     await deleteUsedModule([selectedAccount, moduleToDelete]);
-    toast.success(`Used Module "${moduleToDelete}" excluído com sucesso`);
+    toast.success(`Grupo de projetos "${moduleToDelete}" excluído com sucesso`);
     closeDeleteConfirm();
     loadStructure();
   };
@@ -149,7 +149,7 @@ export function ProjectGroupTable() {
   return (
     <div className="p-12">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Used Modules</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Grupo de Projetos</h2>
         <div className="flex gap-2">
           <Button
             onClick={openCreateDialog}

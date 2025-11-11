@@ -68,17 +68,17 @@ public class ProjectService
         var structure = TerraformStructureLoader.Load(_terraformSettings);
         
         var account = structure.Accounts.FirstOrDefault(a => a.Name == request.AccountName)
-                      ?? throw new DirectoryNotFoundException($"Account {request.AccountName} not found.");
+                      ?? throw new DirectoryNotFoundException($"Conta {request.AccountName} não encontrada.");
 
         var projectGroup = account.ProjectGroups.FirstOrDefault(m => m.Name == request.ProjectGroupName)
-                         ?? throw new DirectoryNotFoundException($"UsedModule {request.ProjectGroupName} not found in account {request.AccountName}.");
+                         ?? throw new DirectoryNotFoundException($"Grupo de projetos {request.ProjectGroupName} não encontrado na conta {request.AccountName}.");
 
         var sourceModule = structure.Modules.FirstOrDefault(m => m.Name == request.ModuleName)
-                           ?? throw new DirectoryNotFoundException($"Module {request.ModuleName} not found in modules/.");
+                           ?? throw new DirectoryNotFoundException($"Módulo {request.ModuleName} não encontrado em modules/.");
 
         var projectPath = Path.Combine(projectGroup.Path, request.ProjectName);
         if (Directory.Exists(projectPath))
-            throw new InvalidOperationException($"Project {request.ProjectName} already exists.");
+            throw new InvalidOperationException($"Projeto {request.ProjectName} já existe.");
 
         Directory.CreateDirectory(projectPath);
 

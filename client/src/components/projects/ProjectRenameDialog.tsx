@@ -61,14 +61,13 @@ export function ProjectRenameDialog({
   };
 
   const handleConfirm = async () => {
-  setConfirmOpen(false);
-  
-  await renameProject(newName.trim());
-  toast.success(`Projeto renomeado para "${newName.trim()}"`);
-  onRenameSuccess?.(newName.trim());
-  onClose();
-};
+    setConfirmOpen(false);
 
+    await renameProject(newName.trim());
+    toast.success(`Projeto renomeado para "${newName.trim()}"`);
+    onRenameSuccess?.(newName.trim());
+    onClose();
+  };
 
   const handleCancel = () => {
     setConfirmOpen(false);
@@ -81,7 +80,7 @@ export function ProjectRenameDialog({
       <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Renomear Projeto</DialogTitle>
+            <DialogTitle>Renomear projeto</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">

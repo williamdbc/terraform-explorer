@@ -106,7 +106,7 @@ export function ProjectGroupCopyDialog({
       return false;
     }
     if (!d.groupName.trim()) {
-      toast.error("Nome do used module destino é obrigatório");
+      toast.error("Nome do grupo de projetos de destino é obrigatório");
       return false;
     }
     return true;
@@ -122,7 +122,7 @@ export function ProjectGroupCopyDialog({
     setConfirmOpen(false);
 
     await copyUsedModule(formData);
-    toast.success("Used module copiado com sucesso");
+    toast.success("Grupo de projetos copiado com sucesso");
     onCopySuccess?.();
     onClose();
     updateDestinationField("groupName", "");
@@ -139,12 +139,12 @@ export function ProjectGroupCopyDialog({
       <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Copiar Used Module</DialogTitle>
+            <DialogTitle>Copiar grupo de projetos</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
             <FormSelect
-              label="Conta de Origem"
+              label="Conta de origem"
               value={formData.source.accountName}
               onValueChange={handleSourceAccountChange}
               options={accountOptions}
@@ -152,7 +152,7 @@ export function ProjectGroupCopyDialog({
             />
 
             <FormSelect
-              label="Used Module de Origem"
+              label="Grupo de projetos de origem"
               value={formData.source.groupName}
               onValueChange={handleSourceModuleChange}
               options={sourceModuleOptions}
@@ -160,7 +160,7 @@ export function ProjectGroupCopyDialog({
             />
 
             <FormSelect
-              label="Conta de Destino"
+              label="Conta de destino"
               value={formData.destination.accountName}
               onValueChange={handleDestAccountChange}
               options={accountOptions}
@@ -169,10 +169,10 @@ export function ProjectGroupCopyDialog({
 
             <FormInput
               id="module-name-dest"
-              label="Nome do Used Module Destino"
+              label="Nome do gruoo de projetos de destino"
               value={formData.destination.groupName}
               onChange={handleDestModuleNameChange}
-              placeholder="nome-do-used-module"
+              placeholder="nome-do-grupo-projetos"
               disabled={loading}
             />
 

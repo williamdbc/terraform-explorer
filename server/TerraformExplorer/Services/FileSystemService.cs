@@ -76,8 +76,8 @@ public class FileSystemService
         var oldFull = Validate(oldPath);
         var newFull = Validate(newPath);
 
-        EnsureExists(oldPath, "Item");
-        EnsureNotExists(newPath, "Item");
+        EnsureExists(oldPath, "Diretório ou arquivo");
+        EnsureNotExists(newPath, "Diretório ou arquivo");
 
         if (File.Exists(oldFull))
             File.Move(oldFull, newFull);

@@ -89,7 +89,7 @@ export function ProjectCreateDialog({
       return false;
     }
     if (!formData.projectGroupName.trim()) {
-      toast.error("Used Module é obrigatório");
+      toast.error("Grupo de projetos é obrigatório");
       return false;
     }
     if (!formData.moduleName.trim()) {
@@ -135,7 +135,7 @@ export function ProjectCreateDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Novo Projeto</DialogTitle>
+            <DialogTitle>Novo projeto</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -148,7 +148,7 @@ export function ProjectCreateDialog({
             />
 
             <FormSelect
-              label="Used Module"
+              label="Grupo de projetos"
               value={formData.projectGroupName}
               onValueChange={handleProjectGroupChange}
               options={projectGroupOptions}

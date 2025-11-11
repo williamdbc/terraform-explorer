@@ -102,7 +102,7 @@ export function AccountCreateEditDialog({
       <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{mode === "create" ? "Nova Conta" : "Editar Conta"}</DialogTitle>
+            <DialogTitle>{mode === "create" ? "Nova conta" : "Editar conta"}</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -129,7 +129,7 @@ export function AccountCreateEditDialog({
         open={confirmOpen}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
-        title={mode === "create" ? "Nova Conta" : "Editar Conta"}
+        title={mode === "create" ? "Nova conta" : "Editar conta"}
         description={
           mode === "create"
             ? `Deseja realmente criar a conta "${accountName.trim()}"?`

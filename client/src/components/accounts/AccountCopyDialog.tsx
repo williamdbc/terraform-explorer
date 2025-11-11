@@ -103,12 +103,12 @@ export function AccountCopyDialog({
       <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Copiar Conta</DialogTitle>
+            <DialogTitle>Copiar conta</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
             <FormSelect
-              label="Conta de Origem"
+              label="Conta de origem"
               value={formData.sourceAccountName}
               onValueChange={handleSourceAccountChange}
               options={accountOptions}
@@ -117,7 +117,7 @@ export function AccountCopyDialog({
 
             <FormInput
               id="dest-account-name"
-              label="Nome da Nova Conta"
+              label="Nome da nova conta"
               value={formData.destinationAccountName}
               onChange={handleDestAccountNameChange}
               placeholder="nome-da-nova-conta"
@@ -132,7 +132,7 @@ export function AccountCopyDialog({
                 disabled={loading}
               />
               <label htmlFor="copyProjectGorup" className="text-sm text-slate-700 select-none">
-                Copiar Grupos de Projeto
+                Copiar grupos de projetos
               </label>
             </div>
 

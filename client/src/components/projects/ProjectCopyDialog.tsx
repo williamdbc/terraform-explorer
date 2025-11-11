@@ -91,7 +91,7 @@ export function ProjectCopyDialog({
       return false;
     }
     if (!formData.destination.moduleName.trim()) {
-      toast.error("Used module destino é obrigatório");
+      toast.error("Grupo de projetos de destino é obrigatório");
       return false;
     }
     if (!formData.destination.projectName.trim()) {
@@ -138,12 +138,12 @@ export function ProjectCopyDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Copiar Projeto</DialogTitle>
+            <DialogTitle>Copiar projeto</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
             <FormSelect
-              label="Conta Destino"
+              label="Conta destino"
               value={formData.destination.accountName}
               onValueChange={handleDestAccountChange}
               options={destinationAccountOptions}
@@ -152,7 +152,7 @@ export function ProjectCopyDialog({
             />
 
             <FormSelect
-              label="Used Module Destino"
+              label="Grupo de projetos de destino"
               value={formData.destination.moduleName}
               onValueChange={handleDestModuleChange}
               options={destinationModuleOptions}
@@ -161,7 +161,7 @@ export function ProjectCopyDialog({
             />
 
             <FormSelect
-              label="Projeto Origem"
+              label="Projeto origem"
               value={formData.source.projectName}
               onValueChange={handleSourceProjectChange}
               options={sourceProjectOptions}
@@ -171,7 +171,7 @@ export function ProjectCopyDialog({
 
             <FormInput
               id="dest-project-name"
-              label="Nome do Projeto Destino"
+              label="Nome do projeto destino"
               value={formData.destination.projectName}
               onChange={handleDestProjectNameChange}
               placeholder="Nome para o novo projeto"

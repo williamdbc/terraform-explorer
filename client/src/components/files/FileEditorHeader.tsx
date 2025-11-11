@@ -29,7 +29,7 @@ export function FileEditorHeader({
         </h3>
         {modified && (
           <span className="text-xs bg-amber-600 text-amber-100 px-2 py-0.5 rounded">
-            Modified
+            Modificado
           </span>
         )}
       </div>

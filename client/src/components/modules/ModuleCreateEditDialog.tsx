@@ -91,7 +91,7 @@ export function ModuleCreateEditDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{mode === "create" ? "Novo Módulo" : "Editar Módulo"}</DialogTitle>
+            <DialogTitle>{mode === "create" ? "Novo módulo" : "Editar módulo"}</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -118,7 +118,7 @@ export function ModuleCreateEditDialog({
         open={confirmOpen}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirm}
-        title={mode === "create" ? "Novo Módulo" : "Editar Módulo"}
+        title={mode === "create" ? "Novo módulo" : "Editar módulo"}
         description={mode === "create"
           ? `Deseja realmente criar o módulo "${moduleName.trim()}"?`
           : `Deseja renomear o módulo para "${moduleName.trim()}"?`}

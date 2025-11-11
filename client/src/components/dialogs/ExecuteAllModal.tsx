@@ -105,8 +105,8 @@ export function ExecuteAllModal({
           <div className="px-6 py-4 border-b flex items-start gap-3 bg-blue-50 border-blue-200">
             <div className="flex-1 min-w-0">
               <div className="mt-2 space-y-1 text-sm text-blue-700">
-                {accountName && <p><span className="font-medium">Account:</span> {accountName}</p>}
-                {projectGroupName && <p><span className="font-medium">Used Module:</span> {projectGroupName}</p>}
+                {accountName && <p><span className="font-medium">Conta:</span> {accountName}</p>}
+                {projectGroupName && <p><span className="font-medium">Grupo de projetos:</span> {projectGroupName}</p>}
                 <p>
                   <span className="font-medium">Projetos:</span> {projects.length}
                   {selectedProjects.length !== projects.length && ` (selecionados: ${selectedProjects.length})`}
@@ -178,7 +178,7 @@ export function ExecuteAllModal({
                 id="custom-command"
                 value={custom}
                 onChange={(e) => setCustom(e.target.value)}
-                placeholder="ex: terraform plan -var 'x=1'"
+                placeholder="ex: plan -var 'x=1'"
                 className="font-mono text-sm"
                 disabled={loading}
                 onKeyDown={(e) => {
@@ -202,7 +202,7 @@ export function ExecuteAllModal({
               ) : (
                 <>
                   <PlayCircle className="w-4 h-4 mr-2" />
-                  Executar Customizado
+                  Executar customizado
                 </>
               )}
             </Button>

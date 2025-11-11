@@ -37,7 +37,7 @@ public class ProjectGroupService
     public ItemResponse Get(string accountName, string moduleName)
     {
         var path = GetPath(accountName, moduleName);
-        _fileSystemService.EnsureExists(path, "UsedModule");
+        _fileSystemService.EnsureExists(path, "Grupo de projetos");
         return new ItemResponse { Name = moduleName, Path = path };
     }
 

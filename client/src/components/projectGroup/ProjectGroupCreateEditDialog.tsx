@@ -86,11 +86,11 @@ export function ProjectGroupCreateEditDialog({
 
     if (mode === "create") {
       await createModule([selectedAccount, { name: moduleName.trim() }]);
-      toast.success("Used Module criado com sucesso");
+      toast.success("Grupo de projetos criado com sucesso");
       onCreateSuccess?.();
     } else {
       await renameModule([accountName, initialName, { newName: moduleName.trim() }]);
-      toast.success("Used Module renomeado com sucesso");
+      toast.success("Grupo de projetos renomeado com sucesso");
       onEditSuccess?.();
     }
     onClose();
@@ -104,7 +104,7 @@ export function ProjectGroupCreateEditDialog({
       <Dialog open={open} onOpenChange={o => !o && onClose()}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{mode === "create" ? "Novo Used Module" : "Editar Used Module"}</DialogTitle>
+            <DialogTitle>{mode === "create" ? "Novo grupo de projetos" : "Editar grupo de projetos"}</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-2">
@@ -141,10 +141,10 @@ export function ProjectGroupCreateEditDialog({
         open={confirmOpen}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirm}
-        title={mode === "create" ? "Novo Used Module" : "Editar Used Module"}
+        title={mode === "create" ? "Novo grupo de projetos" : "Editar grupo de projetos"}
         description={mode === "create"
-          ? `Deseja realmente criar o used module "${moduleName.trim()}" na conta "${selectedAccount}"?`
-          : `Deseja renomear o used module para "${moduleName.trim()}"?`}
+          ? `Deseja realmente criar o grupo de projetos "${moduleName.trim()}" na conta "${selectedAccount}"?`
+          : `Deseja renomear o grupo de projetos para "${moduleName.trim()}"?`}
         cancelText="Cancelar"
         confirmText={mode === "create" ? "Criar" : "Salvar"}
         type={mode === "create" ? "create" : "edit"}
