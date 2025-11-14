@@ -190,7 +190,7 @@ export function ProjectGroupCopyDialog({
         onCancel={handleCancel}
         onConfirm={handleConfirm}
         title="Confirmar cópia"
-        description={`Deseja copiar o used module "${formData.source.groupName}" da conta "${formData.source.accountName}" para "${formData.destination.groupName}" na conta "${formData.destination.accountName}"?`}
+        description={`Deseja copiar o grupo de projetos "${formData.source.groupName}" da conta "${formData.source.accountName}" para "${formData.destination.groupName}" na conta "${formData.destination.accountName}"?`}
         cancelText="Cancelar"
         confirmText="Copiar"
       />

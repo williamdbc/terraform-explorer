@@ -62,7 +62,7 @@ export function ProjectsTable() {
       return;
     }
     if (!selectedProjectGroup) {
-      toast.error("Selecione um used module primeiro");
+      toast.error("Selecione um grupo de projetos primeiro");
       return;
     }
     setShowCreate(true);
@@ -150,11 +150,11 @@ export function ProjectsTable() {
 
         <div className="w-64">
           <FormSelect
-            label="Filtrar por used module"
+            label="Filtrar por grupo de projetos"
             value={selectedProjectGroup}
             onValueChange={handleProjectGroupChange}
             options={projectGroups.map(mod => ({ value: mod.name, label: mod.name }))}
-            placeholder="Selecione o used module"
+            placeholder="Selecione o grupo de projetos"
             disabled={!selectedAccount}
           />
         </div>
@@ -178,13 +178,13 @@ export function ProjectsTable() {
             ) : !selectedProjectGroup ? (
               <TableRow>
                 <TableCell colSpan={2} className="text-center text-slate-500 py-8">
-                  Selecione um used module para visualizar os projetos
+                  Selecione um grupo de projetos para visualizar os projetos
                 </TableCell>
               </TableRow>
             ) : projects.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={2} className="text-center text-slate-500 py-8">
-                  Nenhum projeto encontrado neste used module
+                  Nenhum projeto encontrado neste grupo de projetos
                 </TableCell>
               </TableRow>
             ) : (
