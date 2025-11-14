@@ -17,7 +17,7 @@ export function FileCreateHeader({
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 bg-slate-800">
       <div className="flex items-center gap-2">
-        <FilePlus className="w-5 h-5 text-green-400" />
+        <FilePlus className="w-5 h-5 text-slate-400" />
         <h3 className="font-mono text-sm text-slate-100">Novo Arquivo</h3>
       </div>
 

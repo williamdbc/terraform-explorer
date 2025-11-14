@@ -17,7 +17,7 @@ export function ModuleFiles({
     <div className="bg-white border-b border-slate-200">
       <div className="px-6 py-3">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-900">Files</h3>
+          <h3 className="text-sm font-semibold text-slate-900">Arquivos</h3>
           <Button
             onClick={onCreateFile}
             size="sm"

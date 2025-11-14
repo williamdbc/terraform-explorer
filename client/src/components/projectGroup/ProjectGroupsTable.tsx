@@ -184,13 +184,13 @@ export function ProjectGroupTable() {
             {!selectedAccount ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-slate-500 py-8">
-                  Selecione uma conta para visualizar os used modules
+                  Selecione uma conta para visualizar os grupo de projetos
                 </TableCell>
               </TableRow>
             ) : usedModules.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-slate-500 py-8">
-                  Nenhum used module encontrado nesta conta
+                  Nenhum grupo de projetos encontrado nesta conta
                 </TableCell>
               </TableRow>
             ) : (
@@ -283,7 +283,7 @@ export function ProjectGroupTable() {
         onCancel={closeDeleteConfirm}
         onConfirm={handleDelete}
         title="Confirma exclusão"
-        description={`Confirma a exclusão do used module "${moduleToDelete}"?`}
+        description={`Confirma a exclusão do grupo de projeto "${moduleToDelete}"?`}
         cancelText="Cancelar"
         confirmText="Excluir"
         type="delete"
