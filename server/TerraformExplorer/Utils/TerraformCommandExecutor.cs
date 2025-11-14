@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,6 +11,7 @@ namespace TerraformExplorer.Utils;
 
 public static class TerraformCommandExecutor
 {
+    private static readonly string PluginCacheDir = Path.Combine(Path.GetTempPath(), ".terraform-plugin-cache");
     public static async Task<ExecuteAllResponse> ExecuteAllAsync(ExecuteAllRequest request, TerraformSettings settings)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -29,24 +31,25 @@ public static class TerraformCommandExecutor
         if (validDirs.Count == 0)
             throw new ArgumentException("At least one valid WorkingDir is required.", nameof(request.WorkingDirs));
 
-        var maxParallelism = Math.Max(1, Environment.ProcessorCount);
-        var results = new List<CommandResponse>();
+        var maxParallelism = Math.Max(1, Environment.ProcessorCount / 2);
+        var results = new ConcurrentBag<(string Dir, CommandResponse Response)>();
 
         await Parallel.ForEachAsync(validDirs, new ParallelOptions
         {
             MaxDegreeOfParallelism = maxParallelism
         }, async (dir, ct) =>
         {
-            var result = await ExecuteSingleAsync(request.Command, dir, settings);
-
-            lock (results)
-                results.Add(result);
+            var optimizedCmd = OptimizeCommandForInit(request.Command);
+            var result = await ExecuteSingleAsync(optimizedCmd, dir, settings);
+            results.Add((dir, result));
         });
+        
+        var ordered = validDirs
+            .Select(dir => results.FirstOrDefault(r => r.Dir == dir).Response)
+            .Where(r => r != null)
+            .ToList();
 
-        return new ExecuteAllResponse
-        {
-            Results = results
-        };
+        return new ExecuteAllResponse { Results = ordered! };
     }
 
     public static async Task<CommandResponse> ExecuteSingleAsync(
@@ -58,6 +61,7 @@ public static class TerraformCommandExecutor
         {
             return new CommandResponse
             {
+                WorkingDir = workingDir,
                 Output = $"Directory not found: {workingDir}",
                 ExitCode = -1,
                 ExecutionTimeMs = 0
@@ -73,7 +77,9 @@ public static class TerraformCommandExecutor
         {
             ["HOME"] = "/root",
             ["AWS_SHARED_CREDENTIALS_FILE"] = settings.GetProvidersPath() + "/credentials",
-            ["AWS_CONFIG_FILE"] = settings.GetProvidersPath() + "/config"
+            ["AWS_CONFIG_FILE"] = settings.GetProvidersPath() + "/config",
+            ["TF_PLUGIN_CACHE_DIR"] = PluginCacheDir,
+            ["TF_LOG"] = "ERROR"
         };
 
         if (account != null)
@@ -128,6 +134,7 @@ public static class TerraformCommandExecutor
 
             return new CommandResponse
             {
+                WorkingDir = workingDir,
                 Output = outputBuilder.ToString(),
                 ExitCode = process.ExitCode,
                 ExecutionTimeMs = stopwatch.Elapsed.TotalMilliseconds
@@ -137,6 +144,7 @@ public static class TerraformCommandExecutor
         {
             return new CommandResponse
             {
+                WorkingDir = workingDir,
                 Output = $"Exception: {ex.Message}",
                 ExitCode = -1,
                 ExecutionTimeMs = stopwatch.Elapsed.TotalMilliseconds
@@ -184,5 +192,26 @@ public static class TerraformCommandExecutor
         }
 
         return windowsPath.Replace('\\', '/');
+    }
+    
+    private static string OptimizeCommandForInit(string command)
+    {
+        var cmd = command.Trim();
+        if (!cmd.StartsWith("init", StringComparison.OrdinalIgnoreCase))
+            return cmd;
+
+        var parts = cmd.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        parts = parts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+        void AddIfMissing(string flag) {
+            if (!parts.Any(p => p.Equals(flag, StringComparison.OrdinalIgnoreCase)))
+                parts.Add(flag);
+        }
+
+        AddIfMissing("-reconfigure");
+        AddIfMissing("-upgrade");
+        AddIfMissing("-lockfile=readonly");
+
+        return string.Join(" ", parts);
     }
 }
