@@ -6,6 +6,7 @@ public class TerraformSettings
     public string AccountsFolderName { get; set; } = "accounts";
     public string ModulesFolderName { get; set; } = "modules";
     public string ProvidersAwsFolderName { get; set; } = ".aws";
+    public string TerraformCacheFolderName { get; set; } = ".terraform.d";
 
     public string GetRootPath()
     {
@@ -17,4 +18,5 @@ public class TerraformSettings
     public string GetAccountsPath() => Path.Combine(GetRootPath(), AccountsFolderName);
     public string GetModulesPath() => Path.Combine(GetRootPath(), ModulesFolderName);
     public string GetProvidersPath() => Path.Combine(GetRootPath(), ProvidersAwsFolderName);
+    public string GetTerraformCachePath() => Path.Combine(GetRootPath(), TerraformCacheFolderName, "plugin-cache");
 }

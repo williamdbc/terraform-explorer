@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Builder;
 using TerraformExplorer.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);

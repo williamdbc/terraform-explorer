@@ -15,7 +15,8 @@ public static class DirectoryInitializer
         {
             settings.GetAccountsPath(),
             settings.GetModulesPath(),
-            settings.GetProvidersPath()
+            settings.GetProvidersPath(),
+            settings.GetTerraformCachePath()
         };
 
         foreach (var path in paths)
