@@ -22,15 +22,20 @@ export function MainContent({
 }: MainContentProps) {
   switch (activeView) {
     case "modules":
-      return <ModulesTable/>;
     case "accounts":
-      return <AccountsTable/>;
     case "providers":
-      return <ProvidersTable/>;
     case "projectGroups":
-      return <ProjectGroupTable/>;
     case "projects":
-      return <ProjectsTable/>;
+      return (
+        <div className="h-full overflow-auto p-4">
+          {activeView === "modules" && <ModulesTable />}
+          {activeView === "accounts" && <AccountsTable />}
+          {activeView === "providers" && <ProvidersTable />}
+          {activeView === "projectGroups" && <ProjectGroupTable />}
+          {activeView === "projects" && <ProjectsTable />}
+        </div>
+      );
+
     default:
       return (
         <TerraformContentContainer
