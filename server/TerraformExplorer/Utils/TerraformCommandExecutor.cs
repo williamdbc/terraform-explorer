@@ -11,7 +11,6 @@ namespace TerraformExplorer.Utils;
 
 public static class TerraformCommandExecutor
 {
-    private static readonly string PluginCacheDir = Path.Combine(Path.GetTempPath(), ".terraform-plugin-cache");
     public static async Task<ExecuteAllResponse> ExecuteAllAsync(ExecuteAllRequest request, TerraformSettings settings)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -78,7 +77,7 @@ public static class TerraformCommandExecutor
             ["HOME"] = "/root",
             ["AWS_SHARED_CREDENTIALS_FILE"] = settings.GetProvidersPath() + "/credentials",
             ["AWS_CONFIG_FILE"] = settings.GetProvidersPath() + "/config",
-            ["TF_PLUGIN_CACHE_DIR"] = PluginCacheDir,
+            ["TF_PLUGIN_CACHE_DIR"] = settings.GetTerraformCachePath(),
             ["TF_LOG"] = "ERROR"
         };
 
@@ -203,14 +202,21 @@ public static class TerraformCommandExecutor
         var parts = cmd.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
         parts = parts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-        void AddIfMissing(string flag) {
-            if (!parts.Any(p => p.Equals(flag, StringComparison.OrdinalIgnoreCase)))
+        bool HasFlag(string flag) => 
+            parts.Any(p => p.Equals(flag, StringComparison.OrdinalIgnoreCase));
+
+        void AddIfMissing(string flag)
+        {
+            if (!HasFlag(flag))
                 parts.Add(flag);
         }
 
         AddIfMissing("-reconfigure");
-        AddIfMissing("-upgrade");
-        AddIfMissing("-lockfile=readonly");
+
+        if (!HasFlag("-lockfile=readonly"))
+        {
+            AddIfMissing("-upgrade");
+        }
 
         return string.Join(" ", parts);
     }
