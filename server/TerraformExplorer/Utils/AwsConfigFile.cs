@@ -18,12 +18,11 @@ public static class AwsConfigFile
         foreach (var line in lines)
         {
             var trimmed = line.Trim();
-
-            // Novo bloco encontrado
+            
             if (Regex.IsMatch(trimmed, @"^\[.*\]$"))
             {
                 if (inside)
-                    break; // Já leu o bloco, sai
+                    break;
 
                 inside = trimmed.Equals(targetHeader, StringComparison.OrdinalIgnoreCase);
                 continue;
@@ -147,7 +146,6 @@ public static class AwsConfigFile
                 output.Add(header);
                 output.Add($"region = {region}");
 
-                // SÓ ADICIONA source_profile + role_arn SE roleArn EXISTIR
                 if (!string.IsNullOrWhiteSpace(roleArn))
                 {
                     output.Add($"source_profile = {sourceProfile}");

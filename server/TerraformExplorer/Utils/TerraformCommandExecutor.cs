@@ -66,6 +66,11 @@ public static class TerraformCommandExecutor
                 ExecutionTimeMs = 0
             };
         }
+        
+        if (command.TrimStart().StartsWith("init", StringComparison.OrdinalIgnoreCase))
+        {
+            EnsureTerraformCacheLink(workingDir, settings);
+        }
 
         var (fileName, arguments, resolvedWorkingDir) = GetExecutionConfig(command, workingDir);
         var structure = TerraformStructureLoader.Load(settings);
@@ -219,5 +224,29 @@ public static class TerraformCommandExecutor
         }
 
         return string.Join(" ", parts);
+    }
+    
+    private static void EnsureTerraformCacheLink(string workingDir, TerraformSettings settings)
+    {
+        var terraformDir = Path.Combine(workingDir, ".terraform");
+        var cachePath = settings.GetTerraformCachePath();
+
+        Directory.CreateDirectory(cachePath);
+
+        if (Directory.Exists(terraformDir))
+            Directory.Delete(terraformDir, true);
+        if (File.Exists(terraformDir))
+            File.Delete(terraformDir);
+
+        try
+        {
+            var link = File.CreateSymbolicLink(terraformDir, cachePath);
+            if (!link.Exists)
+                throw new InvalidOperationException("Link simbólico falhou");
+        }
+        catch
+        {
+            Directory.CreateDirectory(terraformDir);
+        }
     }
 }

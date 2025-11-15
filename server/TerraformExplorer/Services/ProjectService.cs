@@ -90,6 +90,8 @@ public class ProjectService
 
         var mainTfPath = Path.Combine(projectPath, "main.tf");
         File.WriteAllText(mainTfPath, mainTfContent);
+        
+        CreateTerraformCacheLink(projectPath);
 
         return mainTfPath;
     }
@@ -111,6 +113,30 @@ public class ProjectService
             throw new InvalidOperationException($"Já existe um projeto com o nome '{newProjectName}' neste módulo.");
 
         _fileSystemService.Rename(oldPath, newPath);
+    }
+    
+    private void CreateTerraformCacheLink(string projectPath)
+    {
+        var terraformDir = Path.Combine(projectPath, ".terraform");
+        var cachePath = _terraformSettings.GetTerraformCachePath();
+
+        Directory.CreateDirectory(cachePath);
+        
+        if (Directory.Exists(terraformDir))
+            Directory.Delete(terraformDir, true);
+        if (File.Exists(terraformDir))
+            File.Delete(terraformDir);
+
+        try
+        {
+            var link = File.CreateSymbolicLink(terraformDir, cachePath);
+            if (!link.Exists)
+                throw new InvalidOperationException($"Falha ao criar link: {terraformDir} -> {cachePath}");
+        }
+        catch (PlatformNotSupportedException)
+        {
+            _fileSystemService.CopyDirectory(cachePath, terraformDir);
+        }
     }
     
 }
