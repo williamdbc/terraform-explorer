@@ -79,7 +79,6 @@ public class AccountService
         account.Region = request.Region;
         
         ProviderTfGenerator.GenerateProvider(account);
-
     }
     
     private string GetConfigPath()

@@ -6,7 +6,7 @@ public class TerraformSettings
     public string AccountsFolderName { get; set; } = "accounts";
     public string ModulesFolderName { get; set; } = "modules";
     public string ProvidersAwsFolderName { get; set; } = ".aws";
-    public string TerraformCacheFolderName { get; set; } = ".terraform.d";
+    public string TerraformCacheFolderName { get; set; } = ".terraform-cache";
 
     public string GetRootPath()
     {
