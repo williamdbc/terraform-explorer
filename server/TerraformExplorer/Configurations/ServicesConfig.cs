@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Amazon.S3;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TerraformExplorer.Services;
 
@@ -19,5 +20,6 @@ public static class ServicesConfig
         builder.Services.AddScoped<FileSystemService>();
         builder.Services.AddScoped<ModuleService>();
         builder.Services.AddScoped<ProjectGroupService>();
+        // builder.Services.AddScoped<AwsS3Service>();
     }
 }

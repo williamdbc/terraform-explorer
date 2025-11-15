@@ -18,9 +18,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("{accountName}/link-provider-to-account")]
-    public IActionResult LinkProviderToAccount(string accountName, [FromBody] SetAwsConfigRequest request)
+    public async Task<IActionResult> LinkProviderToAccount(string accountName, [FromBody] SetAwsConfigRequest request)
     {
-        _accountService.LinkProviderToAccount(accountName, request);
+        await _accountService.LinkProviderToAccount(accountName, request);
         return Ok(new SuccessResponse { Message = $"AWS config updated for account '{accountName}'" });
     }
 

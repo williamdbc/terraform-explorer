@@ -1,5 +1,6 @@
 using System.Text;
 using TerraformExplorer.Models;
+using TerraformExplorer.Services;
 
 namespace TerraformExplorer.Utils;
 
@@ -45,6 +46,23 @@ public static class ProviderTfGenerator
             GenerateSimple(account);
         else
             Generate(account);
+    }
+    
+    public static async Task GenerateBackendAsync(Account account, AwsS3Service s3Service){
+        var bucketName = $"tf-state-{account.Name}".ToLower().Replace("_", "-");
+        await s3Service.EnsureBucketExistsAsync(bucketName);
+
+        var sb = new StringBuilder();
+        sb.AppendLine("terraform {");
+        sb.AppendLine("  backend \"s3\" {");
+        sb.AppendLine($"    bucket = \"{bucketName}\"");
+        sb.AppendLine("    key    = \"terraform.tfstate\"");
+        sb.AppendLine($"    region = \"{account.Region}\"");
+        sb.AppendLine("    encrypt = true");
+        sb.AppendLine("  }");
+        sb.AppendLine("}");
+
+        File.WriteAllText(Path.Combine(account.Path, "backend.tf"), sb.ToString());
     }
 
 }

@@ -12,14 +12,17 @@ public class AccountService
     private readonly TerraformService _terraformService;
     private readonly FileSystemService _fileSystemService;
     private readonly TerraformSettings _terraformSettings;
+    // private readonly AwsS3Service _s3Service;
 
     public AccountService(
         TerraformService terraformService, 
         FileSystemService fileSystemService, 
+        // AwsS3Service s3Service,
         TerraformSettings terraformSettings)
     {
         _terraformService = terraformService;
         _fileSystemService = fileSystemService;
+        // _s3Service = s3Service;
         _terraformSettings = terraformSettings;
     }
     
@@ -68,7 +71,7 @@ public class AccountService
         _fileSystemService.Rename(oldPath, newPath);
     }
     
-    public void LinkProviderToAccount(string accountName, SetAwsConfigRequest request)
+    public async Task LinkProviderToAccount(string accountName, SetAwsConfigRequest request)
     {
         var structure = TerraformStructureLoader.Load(_terraformSettings);
         var account = structure.Accounts.FirstOrDefault(a => a.Name == accountName)
@@ -79,11 +82,20 @@ public class AccountService
         account.Region = request.Region;
         
         ProviderTfGenerator.GenerateProvider(account);
-
+        
+        var credentialsPath = Path.Combine(_terraformSettings.GetProvidersPath(), "credentials");
+        
+        var s3Service = new AwsS3Service(
+            account.AwsProfile,
+            credentialsPath,
+            account.AssumeRoleArn,
+            account.Region
+        );
+        await ProviderTfGenerator.GenerateBackendAsync(account, s3Service);
     }
     
     private string GetConfigPath()
-    {
+    {   
         return Path.Combine(_terraformSettings.GetProvidersPath(), "config");
     }
     
