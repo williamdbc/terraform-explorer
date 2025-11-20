@@ -1,6 +1,9 @@
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { TERRAFORM_ACTIONS } from '@/constants/terraformActions';
+import { useState } from 'react';
 
 interface TerraformActionsProps {
   path: string;
@@ -9,13 +12,20 @@ interface TerraformActionsProps {
   onExecute: (command: string, path: string) => void;
 }
 
-export function TerraformActions({ 
-  path, 
-  hasMainTf, 
-  executing, 
-  onExecute 
+export function TerraformActions({
+  path,
+  hasMainTf,
+  executing,
+  onExecute,
 }: TerraformActionsProps) {
+  const [customCommand, setCustomCommand] = useState('');
   const hasFiles = path.length > 0;
+
+  const handleCustom = () => {
+    if (customCommand.trim()) {
+      onExecute(customCommand.trim(), path);
+    }
+  };
 
   return (
     <div className="bg-white border-b border-slate-200 px-6 py-4">
@@ -23,7 +33,7 @@ export function TerraformActions({
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-semibold text-slate-900">Terraform Actions</h2>
           <p className="text-sm text-slate-600 mt-0.5 font-mono truncate">
-            {path}
+            {path || 'Nenhum diretório selecionado'}
           </p>
         </div>
 
@@ -50,8 +60,8 @@ export function TerraformActions({
         ))}
       </div>
 
-      <div className="flex items-center gap-3">
-        {TERRAFORM_ACTIONS.slice(4, 8).map((action) => (
+      <div className="flex items-center gap-3 mb-5">
+        {TERRAFORM_ACTIONS.slice(4).map((action) => (
           <Button
             key={action.id}
             onClick={() => onExecute(action.command, path)}
@@ -65,10 +75,34 @@ export function TerraformActions({
         ))}
       </div>
 
+      <div className="border-t border-slate-200 pt-5">
+        <Label htmlFor="custom-tf" className="text-sm font-semibold text-slate-900 mb-2 block">
+          Comando Customizado
+        </Label>
+        <div className="flex gap-2 max-w-2xl">
+          <Input
+            id="custom-tf"
+            value={customCommand}
+            onChange={(e) => setCustomCommand(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCustom()}
+            placeholder="ex: plan -out=prod.tfplan"
+            className="font-mono text-sm flex-1 min-w-0"
+            disabled={!hasMainTf || executing}
+          />
+          <Button
+            onClick={handleCustom}
+            disabled={!hasMainTf || executing || !customCommand.trim()}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 shrink-0"
+          >
+            {executing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
+          </Button>
+        </div>
+      </div>
+
       {executing && (
-        <div className="flex items-center justify-center gap-2 text-blue-700 mt-4 pt-3 border-t border-slate-200">
+        <div className="flex items-center justify-center gap-2 text-blue-700 mt-6 pt-4 border-t border-slate-200">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
-          <span className="text-sm font-medium">Executando comando..</span>
+          <span className="text-sm font-medium">Executando comando...</span>
         </div>
       )}
     </div>
