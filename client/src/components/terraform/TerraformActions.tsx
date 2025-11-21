@@ -1,15 +1,16 @@
-import { AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
+import { AlertTriangle, PlayCircle, Loader2, Command } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { TERRAFORM_ACTIONS } from '@/constants/terraformActions';
 import { useState } from 'react';
+import { BatchTerraformDialog } from '@/components/terraform/BatchTerraformDialog';
 
 interface TerraformActionsProps {
   path: string;
   hasMainTf: boolean;
   executing: boolean;
-  onExecute: (command: string, path: string) => void;
+  onExecute: (command: string, path: string) => Promise<void>;
 }
 
 export function TerraformActions({
@@ -19,11 +20,14 @@ export function TerraformActions({
   onExecute,
 }: TerraformActionsProps) {
   const [customCommand, setCustomCommand] = useState('');
+  const [batchOpen, setBatchOpen] = useState(false);
+
   const hasFiles = path.length > 0;
 
   const handleCustom = () => {
     if (customCommand.trim()) {
       onExecute(customCommand.trim(), path);
+      setCustomCommand('');
     }
   };
 
@@ -79,23 +83,42 @@ export function TerraformActions({
         <Label htmlFor="custom-tf" className="text-sm font-semibold text-slate-900 mb-2 block">
           Comando Customizado
         </Label>
-        <div className="flex gap-2 max-w-2xl">
-          <Input
-            id="custom-tf"
-            value={customCommand}
-            onChange={(e) => setCustomCommand(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleCustom()}
-            placeholder="ex: plan -out=prod.tfplan"
-            className="font-mono text-sm flex-1 min-w-0"
-            disabled={!hasMainTf || executing}
-          />
-          <Button
-            onClick={handleCustom}
-            disabled={!hasMainTf || executing || !customCommand.trim()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 shrink-0"
-          >
-            {executing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
-          </Button>
+
+        <div className="flex items-center justify-between gap-4">
+
+          <div className="flex items-center gap-2 flex-1 max-w-2xl">
+            <Input
+              id="custom-tf"
+              value={customCommand}
+              onChange={(e) => setCustomCommand(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleCustom()}
+              placeholder="ex: plan -out=prod.tfplan"
+              className="font-mono text-sm"
+              disabled={!hasMainTf || executing}
+            />
+            <Button
+              onClick={handleCustom}
+              disabled={!hasMainTf || executing || !customCommand.trim()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5"
+            >
+              {executing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
+            </Button>
+          </div>
+
+          <div className="flex-1" />
+
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setBatchOpen(true)}
+              disabled={!hasMainTf || executing}
+              className="flex items-center gap-2 border-slate-300 whitespace-nowrap"
+            >
+              <Command className="w-4 h-4" />
+              Executar Sequência de Comandos
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -105,6 +128,15 @@ export function TerraformActions({
           <span className="text-sm font-medium">Executando comando...</span>
         </div>
       )}
+
+      <BatchTerraformDialog
+        open={batchOpen}
+        onOpenChange={setBatchOpen}
+        path={path}
+        hasMainTf={hasMainTf}
+        executing={executing}
+        onExecuteSingle={onExecute}
+      />
     </div>
   );
 }
