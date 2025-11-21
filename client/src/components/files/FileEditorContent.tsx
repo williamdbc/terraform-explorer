@@ -20,12 +20,12 @@ export function FileEditorContent({
 }: FileEditorContentProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const syncScroll = () => {
-    if (textareaRef.current && preRef.current) {
-      preRef.current.scrollTop = textareaRef.current.scrollTop;
-      preRef.current.scrollLeft = textareaRef.current.scrollLeft;
-    }
+    if (!textareaRef.current || !preRef.current) return;
+    preRef.current.scrollTop = textareaRef.current.scrollTop;
+    preRef.current.scrollLeft = textareaRef.current.scrollLeft;
   };
 
   useEffect(() => {
@@ -34,12 +34,12 @@ export function FileEditorContent({
     const cached = preRef.current.dataset.content;
     if (cached === content) return;
 
-    const highlighted = content
-      .split("\n")
+    const lines = content.split("\n");
+    const highlighted = lines
       .map((line) => {
         const commentIndex = line.indexOf("#");
         if (commentIndex === -1) {
-          return escapeHtmlForDisplay(line);
+          return escapeHtmlForDisplay(line || " ");
         }
         const code = line.slice(0, commentIndex);
         const comment = line.slice(commentIndex);
@@ -47,25 +47,45 @@ export function FileEditorContent({
       })
       .join("\n");
 
-    preRef.current.innerHTML = highlighted;
+    preRef.current.innerHTML = highlighted + (content.endsWith("\n") ? "\n" : "");
     preRef.current.dataset.content = content;
+  }, [content]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    const pre = preRef.current;
+    if (!textarea || !pre) return;
+
+    const syncStyles = () => {
+      const style = getComputedStyle(textarea);
+      pre.style.font = style.font;
+      pre.style.letterSpacing = style.letterSpacing;
+      pre.style.wordSpacing = style.wordSpacing;
+      syncScroll();
+    };
+
+    syncStyles();
+    const observer = new ResizeObserver(syncStyles);
+    observer.observe(textarea);
+
+    return () => observer.disconnect();
   }, [content]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-500 border-t-transparent"></div>
+      <div className="flex h-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div ref={containerRef} className="relative h-full w-full overflow-hidden">
       <pre
         ref={preRef}
-        className="absolute inset-0 p-4 pointer-events-none overflow-hidden whitespace-pre-wrap wrap-break-word font-mono text-sm text-slate-200"
+        className="pointer-events-none absolute inset-0 p-4 select-none overflow-hidden whitespace-pre-wrap wrap-break-word font-mono text-sm text-slate-200"
         style={{
-          lineHeight: "1.6",
+          lineHeight: "1.5",
           tabSize: 2,
           margin: 0,
         }}
@@ -82,10 +102,10 @@ export function FileEditorContent({
         onKeyUp={onCaretUpdate}
         onSelect={onCaretUpdate}
         onScroll={syncScroll}
-        className="absolute inset-0 w-full h-full p-4 bg-transparent text-transparent caret-white font-mono text-sm resize-none focus:outline-none"
+        className="absolute inset-0 h-full w-full resize-none bg-transparent p-4 text-transparent caret-white font-mono text-sm focus:outline-none"
         style={{
+          lineHeight: "1.5",
           tabSize: 2,
-          lineHeight: "1.6",
         }}
         spellCheck={false}
         placeholder="# Edite o conteúdo..."
