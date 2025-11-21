@@ -1,15 +1,16 @@
-import { AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
+import { AlertTriangle, PlayCircle, Loader2, Command } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { TERRAFORM_ACTIONS } from '@/constants/terraformActions';
 import { useState } from 'react';
+import { BatchTerraformDialog } from '@/components/terraform/BatchTerraformDialog';
 
 interface TerraformActionsProps {
   path: string;
   hasMainTf: boolean;
   executing: boolean;
-  onExecute: (command: string, path: string) => void;
+  onExecute: (command: string, path: string) => Promise<void>;
 }
 
 export function TerraformActions({
@@ -19,11 +20,14 @@ export function TerraformActions({
   onExecute,
 }: TerraformActionsProps) {
   const [customCommand, setCustomCommand] = useState('');
+  const [batchOpen, setBatchOpen] = useState(false);
+
   const hasFiles = path.length > 0;
 
   const handleCustom = () => {
     if (customCommand.trim()) {
       onExecute(customCommand.trim(), path);
+      setCustomCommand('');
     }
   };
 
@@ -75,6 +79,7 @@ export function TerraformActions({
         ))}
       </div>
 
+
       <div className="border-t border-slate-200 pt-5">
         <Label htmlFor="custom-tf" className="text-sm font-semibold text-slate-900 mb-2 block">
           Comando Customizado
@@ -84,7 +89,7 @@ export function TerraformActions({
             id="custom-tf"
             value={customCommand}
             onChange={(e) => setCustomCommand(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleCustom()}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleCustom()}
             placeholder="ex: plan -out=prod.tfplan"
             className="font-mono text-sm flex-1 min-w-0"
             disabled={!hasMainTf || executing}
@@ -99,12 +104,34 @@ export function TerraformActions({
         </div>
       </div>
 
+      <div className="flex justify-end mt-5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setBatchOpen(true)}
+          disabled={!hasMainTf || executing}
+          className="flex items-center gap-2 border-slate-300"
+        >
+          <Command className="w-4 h-4" />
+          Executar em Lote
+        </Button>
+      </div>
+
       {executing && (
         <div className="flex items-center justify-center gap-2 text-blue-700 mt-6 pt-4 border-t border-slate-200">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
           <span className="text-sm font-medium">Executando comando...</span>
         </div>
       )}
+
+      <BatchTerraformDialog
+        open={batchOpen}
+        onOpenChange={setBatchOpen}
+        path={path}
+        hasMainTf={hasMainTf}
+        executing={executing}
+        onExecute={onExecute}
+      />
     </div>
   );
 }
