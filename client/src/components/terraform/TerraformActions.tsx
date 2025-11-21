@@ -79,42 +79,47 @@ export function TerraformActions({
         ))}
       </div>
 
-
       <div className="border-t border-slate-200 pt-5">
         <Label htmlFor="custom-tf" className="text-sm font-semibold text-slate-900 mb-2 block">
           Comando Customizado
         </Label>
-        <div className="flex gap-2 max-w-2xl">
-          <Input
-            id="custom-tf"
-            value={customCommand}
-            onChange={(e) => setCustomCommand(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleCustom()}
-            placeholder="ex: plan -out=prod.tfplan"
-            className="font-mono text-sm flex-1 min-w-0"
-            disabled={!hasMainTf || executing}
-          />
-          <Button
-            onClick={handleCustom}
-            disabled={!hasMainTf || executing || !customCommand.trim()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 shrink-0"
-          >
-            {executing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
-          </Button>
-        </div>
-      </div>
 
-      <div className="flex justify-end mt-5">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setBatchOpen(true)}
-          disabled={!hasMainTf || executing}
-          className="flex items-center gap-2 border-slate-300"
-        >
-          <Command className="w-4 h-4" />
-          Executar em Lote
-        </Button>
+        <div className="flex items-center justify-between gap-4">
+
+          <div className="flex items-center gap-2 flex-1 max-w-2xl">
+            <Input
+              id="custom-tf"
+              value={customCommand}
+              onChange={(e) => setCustomCommand(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleCustom()}
+              placeholder="ex: plan -out=prod.tfplan"
+              className="font-mono text-sm"
+              disabled={!hasMainTf || executing}
+            />
+            <Button
+              onClick={handleCustom}
+              disabled={!hasMainTf || executing || !customCommand.trim()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5"
+            >
+              {executing ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
+            </Button>
+          </div>
+
+          <div className="flex-1" />
+
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setBatchOpen(true)}
+              disabled={!hasMainTf || executing}
+              className="flex items-center gap-2 border-slate-300 whitespace-nowrap"
+            >
+              <Command className="w-4 h-4" />
+              Executar Sequência de Comandos
+            </Button>
+          </div>
+        </div>
       </div>
 
       {executing && (
@@ -130,7 +135,7 @@ export function TerraformActions({
         path={path}
         hasMainTf={hasMainTf}
         executing={executing}
-        onExecute={onExecute}
+        onExecuteSingle={onExecute}
       />
     </div>
   );

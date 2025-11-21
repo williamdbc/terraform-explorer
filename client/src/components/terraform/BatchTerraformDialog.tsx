@@ -11,23 +11,30 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Play, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import type { CommandResponse } from "@/interfaces/responses/CommandResponse";
 
 interface BatchTerraformDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  path: string;
-  hasMainTf: boolean;
-  executing: boolean;
-  onExecute: (command: string, path: string) => Promise<void>;
+  path?: string;
+  hasMainTf?: boolean;
+  onExecuteSingle?: (command: string, path: string) => Promise<void>;
+  selectedPaths?: string[];
+  onExecuteAll?: (command: string, paths: string[]) => Promise<CommandResponse[]>;
+  executing?: boolean;
+  onBatchResults?: (results: CommandResponse[]) => void
 }
 
 export function BatchTerraformDialog({
   open,
   onOpenChange,
-  path,
-  hasMainTf,
-  executing,
-  onExecute,
+  path = "",
+  hasMainTf = true,
+  selectedPaths = [],
+  onExecuteSingle,
+  onExecuteAll,
+  executing = false,
+  onBatchResults
 }: BatchTerraformDialogProps) {
   const [commandsText, setCommandsText] = useState("");
 
@@ -36,27 +43,42 @@ export function BatchTerraformDialog({
     .map((cmd) => cmd.trim())
     .filter((cmd) => cmd.length > 0 && !cmd.startsWith("#"));
 
-  const handleRunAll = async () => {
-    if (commands.length === 0) {
-      toast.error("Nenhum comando válido para executar");
-      return;
-    }
+  const isSingleMode = !!onExecuteSingle;
+  const isMultiMode = !!onExecuteAll && selectedPaths.length > 0;
 
-    toast.info(`Iniciando execução de ${commands.length} comando(s) em lote...`);
+  const handleRunAll = async () => {
+    if (commands.length === 0) return toast.error("Nenhum comando válido para executar");
+    if (!isSingleMode && !isMultiMode) return toast.error("Nenhuma função de execução configurada");
+
+    toast.info(`Iniciando sequência de ${commands.length} comando(s)...`);
 
     for (let i = 0; i < commands.length; i++) {
       const cmd = commands[i];
       toast.info(`(${i + 1}/${commands.length}) terraform ${cmd}`);
-      await onExecute(cmd, path);
-      toast.success(`Concluído: terraform ${cmd}`);
+
+      if (isSingleMode && onExecuteSingle) {
+        await onExecuteSingle(cmd, path);
+        toast.success(`Concluído: terraform ${cmd}`);
+      }
+      else if (isMultiMode && onExecuteAll) {
+        const results = await onExecuteAll(cmd, selectedPaths);
+        toast.success(`Concluído em ${results.length} projeto(s): terraform ${cmd}`);
+        onBatchResults?.(results);
+      }
     }
 
-    toast.success("Todos os comandos foram executados com sucesso!");
+    toast.success("Sequência concluída com sucesso!");
     onOpenChange(false);
     setCommandsText("");
   };
 
-  const isDisabled = !hasMainTf || executing || commands.length === 0;
+  const isDisabled =
+    executing ||
+    commands.length === 0 ||
+    (!isSingleMode && !isMultiMode) ||
+    (isSingleMode && !hasMainTf);
+
+  const projectCount = isMultiMode ? selectedPaths.length : 1;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -64,32 +86,36 @@ export function BatchTerraformDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Terminal className="w-5 h-5" />
-            Executar Comandos em Lote
+            Executar Sequência de Comandos
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div>
-            <Label htmlFor="batch-commands" className="text-sm font-semibold">
+            <Label className="text-sm font-semibold">
               Comandos Terraform (um por linha)
             </Label>
             <Textarea
-              id="batch-commands"
               value={commandsText}
               onChange={(e) => setCommandsText(e.target.value)}
-              placeholder={`init \nplan\napply\ndestroy\n# linha comentada é ignorada`}
+              placeholder={`init
+plan
+apply
+# apply -auto-approve
+# destroy`}
               className="font-mono text-sm mt-2 h-64 resize-none"
               disabled={executing}
             />
             <p className="text-xs text-slate-500 mt-2">
-              Linhas vazias e comentários com <code className="bg-slate-100 px-1 rounded">#</code> são ignorados.
+              Linhas vazias e comentários com{" "}
+              <code className="bg-slate-100 px-1 rounded">#</code> são ignorados.
             </p>
           </div>
 
           {commands.length > 0 && !executing && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm font-medium text-blue-900">
-                {commands.length} comando(s) serão executados:
+                {commands.length} comando(s) → {projectCount} projeto(s)
               </p>
               <ul className="mt-2 space-y-1 text-sm font-mono text-blue-800">
                 {commands.map((cmd, i) => (
@@ -123,7 +149,7 @@ export function BatchTerraformDialog({
             ) : (
               <>
                 <Play className="w-4 h-4 mr-2" />
-                Executar Todos ({commands.length})
+                Executar Sequência ({commands.length})
               </>
             )}
           </Button>
