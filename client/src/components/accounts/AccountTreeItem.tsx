@@ -43,7 +43,7 @@ export function AccountTreeItem({
           "w-4 h-4",
           expanded ? "text-orange-400" : "text-orange-400 fill-orange-400"
         )} />
-        <span className="font-medium text-slate-900 truncate">{account.name}</span>
+        <span title={account.name} className="font-medium text-slate-900 truncate">{account.name}</span>
         <span className="ml-auto text-xs text-slate-500">{account.projectGroups?.length}</span>
       </button>
 

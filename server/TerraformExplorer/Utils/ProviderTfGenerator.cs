@@ -5,9 +5,10 @@ namespace TerraformExplorer.Utils;
 
 public static class ProviderTfGenerator
 {
-    public static void Generate(Account account)
+    public static void Generate(Account account, string? providerPath = null)
     {
-        var providerTfPath = Path.Combine(account.Path, "provider.tf");
+        var targetPath = providerPath ?? account.Path;
+        var providerTfPath = Path.Combine(targetPath, "provider.tf");
         var sb = new StringBuilder();
 
         sb.AppendLine("provider \"aws\" {");
@@ -27,24 +28,29 @@ public static class ProviderTfGenerator
         sb.AppendLine("}");
         File.WriteAllText(providerTfPath, sb.ToString());
     }
-    
-    public static void GenerateSimple(Account account)
+
+    public static void GenerateSimple(Account account, string? providerPath = null)
     {
+        var targetPath = providerPath ?? account.Path;
+        var providerTfPath = Path.Combine(targetPath, "provider.tf");
         var sb = new StringBuilder();
+
         sb.AppendLine("provider \"aws\" {");
         sb.AppendLine($"  region  = \"{account.Region ?? "us-east-1"}\"");
+
         if (!string.IsNullOrWhiteSpace(account.AwsProfile))
             sb.AppendLine($"  profile = \"{account.AwsProfile}\"");
+
         sb.AppendLine("}");
-        File.WriteAllText(Path.Combine(account.Path, "provider.tf"), sb.ToString());
+        File.WriteAllText(providerTfPath, sb.ToString());
     }
-    
-    public static void GenerateProvider(Account account)
+
+    public static void GenerateProvider(Account account, string? providerPath = null)
     {
         if (string.IsNullOrWhiteSpace(account.AssumeRoleArn))
-            GenerateSimple(account);
+            GenerateSimple(account, providerPath);
         else
-            Generate(account);
+            Generate(account, providerPath);
     }
 
 }

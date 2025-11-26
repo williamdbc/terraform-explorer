@@ -18,7 +18,7 @@ export function ProjectExplorerItem({ project, selected, onSelect }: ProjectExpl
       )}
     >
       <FaRocket className={`w-4 h-4 ${selected ? "text-emerald-500" : "text-emerald-500"}`} />
-      <span className="truncate">{project.name}</span>
+      <span title={project.name} className="truncate">{project.name}</span>
     </button>
   );
 }

@@ -2,6 +2,7 @@ using TerraformExplorer.Models;
 using TerraformExplorer.Models.Requests;
 using TerraformExplorer.Models.Responses;
 using TerraformExplorer.Settings;
+using TerraformExplorer.Utils;
 
 namespace TerraformExplorer.Services;
 
@@ -22,11 +23,27 @@ public class ProjectGroupService
     {
         var source = request.Source;
         var destination = request.Destination;
-        
+    
         var sourcePath = GetPath(source.AccountName, source.GroupName);
-        var destPath = GetPath(destination.AccountName, destination.GroupName);;
+        var destPath = GetPath(destination.AccountName, destination.GroupName);
 
         _fileSystemService.CopyDirectory(sourcePath, destPath);
+
+        RegenerateProvidersInGroup(destination.AccountName, destPath);
+    }
+    
+    private void RegenerateProvidersInGroup(string accountName, string groupPath)
+    {
+        var structure = TerraformStructureLoader.Load(_terraformSettings);
+        var account = structure.Accounts.FirstOrDefault(a => a.Name == accountName)
+                      ?? throw new DirectoryNotFoundException($"Conta {accountName} não encontrada.");
+        
+        var projectDirs = Directory.GetDirectories(groupPath);
+
+        foreach (var projectDir in projectDirs)
+        {
+            ProviderTfGenerator.GenerateProvider(account, projectDir);
+        }
     }
     
     private string GetPath(string accountName, string moduleName)

@@ -74,7 +74,7 @@ export function FileExplorer({
                 )}
               >
                 <FaCubes className="w-4 h-4 shrink-0 text-violet-600" />
-                <span className="truncate">{module.name}</span>
+                <span title={module.name} className="truncate">{module.name}</span>
               </button>
             ))}
           </div>

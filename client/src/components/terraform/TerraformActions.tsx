@@ -27,7 +27,6 @@ export function TerraformActions({
   const handleCustom = () => {
     if (customCommand.trim()) {
       onExecute(customCommand.trim(), path);
-      setCustomCommand('');
     }
   };
 
