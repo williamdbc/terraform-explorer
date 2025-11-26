@@ -26,6 +26,12 @@ public class ProjectService
         var destPath = GetPath(destination.AccountName, destination.ModuleName, destination.ProjectName);
 
         _fileSystemService.CopyDirectory(sourcePath, destPath);
+        
+        var structure = TerraformStructureLoader.Load(_terraformSettings);
+        var account = structure.Accounts.FirstOrDefault(a => a.Name == destination.AccountName)
+                      ?? throw new DirectoryNotFoundException($"Conta {destination.AccountName} não encontrada.");
+        
+        ProviderTfGenerator.GenerateProvider(account, destPath);
 
         return destPath;
     }
@@ -63,7 +69,7 @@ public class ProjectService
         _fileSystemService.DeleteDirectory(path);
     }
 
-    public string CreateProject(CreateProjectRequest request)
+    public string Create(CreateProjectRequest request)
     {
         var structure = TerraformStructureLoader.Load(_terraformSettings);
         
@@ -90,11 +96,13 @@ public class ProjectService
 
         var mainTfPath = Path.Combine(projectPath, "main.tf");
         File.WriteAllText(mainTfPath, mainTfContent);
+        
+        ProviderTfGenerator.GenerateProvider(account, projectPath);
   
         return mainTfPath;
     }
     
-    public void RenameProject(string accountName, string moduleName, string oldProjectName, string newProjectName)
+    public void Rename(string accountName, string moduleName, string oldProjectName, string newProjectName)
     {
         if (string.IsNullOrWhiteSpace(newProjectName))
             throw new ArgumentException("O novo nome do projeto não pode ser vazio.");

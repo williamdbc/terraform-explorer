@@ -19,7 +19,7 @@ public class ProjectController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] CreateProjectRequest request)
     {
-        _projectService.CreateProject(request);
+        _projectService.Create(request);
         return Ok(new SuccessResponse { Message = "Projeto criado com sucesso.", });
     }
 
@@ -58,7 +58,7 @@ public class ProjectController : ControllerBase
         string projectName, 
         [FromBody] RenameProjectRequest request)
     {
-        _projectService.RenameProject(accountName, moduleName, projectName, request.NewProjectName);
+        _projectService.Rename(accountName, moduleName, projectName, request.NewProjectName);
         return Ok(new SuccessResponse 
         { 
             Message = $"Projeto '{projectName}' renomeado para '{request.NewProjectName}' com sucesso." 

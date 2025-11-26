@@ -29,6 +29,23 @@ public class AccountService
         var destPath = GetPath(request.DestinationAccountName);
 
         _fileSystemService.CopyDirectory(sourcePath, destPath);
+        
+        RegenerateProvidersInAccount(request.DestinationAccountName, destPath);
+    }
+    
+    private void RegenerateProvidersInAccount(string accountName, string accountPath)
+    {
+        var structure = TerraformStructureLoader.Load(_terraformSettings);
+        var account = structure.Accounts.FirstOrDefault(a => a.Name == accountName)
+                      ?? throw new DirectoryNotFoundException($"Conta {accountName} não encontrada.");
+        
+        foreach(var groupDir in Directory.GetDirectories(accountPath))
+        {
+            foreach(var projectDir in Directory.GetDirectories(groupDir))
+            {
+                ProviderTfGenerator.GenerateProvider(account, projectDir);
+            }
+        }
     }
     
     private string GetPath(string name)
