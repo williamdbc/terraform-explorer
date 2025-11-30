@@ -53,7 +53,7 @@ export function TerraformActions({
           <Button
             key={action.id}
             onClick={() => onExecute(action.command, path)}
-            disabled={!hasMainTf || executing}
+            disabled={executing}
             className={`${action.className} min-w-28`}
             size="default"
           >
@@ -68,7 +68,7 @@ export function TerraformActions({
           <Button
             key={action.id}
             onClick={() => onExecute(action.command, path)}
-            disabled={!hasMainTf || executing}
+            disabled={executing}
             className={`${action.className} min-w-28`}
             size="default"
           >
