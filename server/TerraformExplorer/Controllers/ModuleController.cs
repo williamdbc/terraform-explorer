@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TerraformExplorer.Models;
 using TerraformExplorer.Models.Requests;
@@ -7,6 +8,7 @@ using TerraformExplorer.Services;
 namespace TerraformExplorer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/modules")]
 public class ModuleController : ControllerBase
 {

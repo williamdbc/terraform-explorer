@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TerraformExplorer.Models.Requests;
 using TerraformExplorer.Models.Responses;
@@ -6,6 +7,7 @@ using TerraformExplorer.Services;
 namespace TerraformExplorer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/projects")]
 public class ProjectController : ControllerBase
 {
