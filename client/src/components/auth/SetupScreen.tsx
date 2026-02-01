@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { FaLayerGroup } from "react-icons/fa";
 import { AuthService } from "@/services/AuthService";
 import { SessionService } from "@/services/SessionService";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function SetupScreen() {
   const [form, setForm] = useState<RegisterRequest>({
@@ -21,16 +22,18 @@ export function SetupScreen() {
     SetupService.setup(data)
   );
 
+  const { refreshAuth } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.displayName.trim() || !form.username.trim() || !form.password.trim()) {
-      toast.error("Preencha todos os campos");
+      toast.error("Preencha todos os campos.");
       return;
     }
 
     if (form.password.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres");
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
 
@@ -43,7 +46,7 @@ export function SetupScreen() {
     });
     
     SessionService.setToken(autoLoginResponse.accessToken);
-    window.location.reload();
+    refreshAuth();
   };
 
   return (

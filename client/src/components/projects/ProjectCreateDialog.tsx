@@ -85,19 +85,19 @@ export function ProjectCreateDialog({
 
   const validateForm = (): boolean => {
     if (!formData.accountName.trim()) {
-      toast.error("Conta é obrigatória");
+      toast.error("Conta é obrigatória.");
       return false;
     }
     if (!formData.projectGroupName.trim()) {
-      toast.error("Grupo de projetos é obrigatório");
+      toast.error("Grupo de projetos é obrigatório.");
       return false;
     }
     if (!formData.moduleName.trim()) {
-      toast.error("Módulo é obrigatório");
+      toast.error("Módulo é obrigatório.");
       return false;
     }
     if (!formData.projectName.trim()) {
-      toast.error("Nome do projeto é obrigatório");
+      toast.error("Nome do projeto é obrigatório.");
       return false;
     }
     return true;
@@ -118,7 +118,7 @@ export function ProjectCreateDialog({
       moduleName: formData.moduleName.trim(),
       projectName: formData.projectName.trim(),
     });
-    toast.success("Projeto criado com sucesso");
+    toast.success("Projeto criado com sucesso.");
     onCreateSuccess?.();
     onClose();
     setFormData(initialFormData);

@@ -36,7 +36,7 @@ export default class HttpClient {
           const code = error.code;
     
           if (status === 401) {
-            // SessionService.handleExpiredSession();
+            SessionService.handleExpiredSession();
           } else if (code === "ERR_NETWORK") {
             console.error("Erro de rede:", error.message);
           } else if (status && status >= 500) {

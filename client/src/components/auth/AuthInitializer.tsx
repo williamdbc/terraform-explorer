@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { SetupService } from "@/services/SetupService";
 import { AuthService } from "@/services/AuthService";
 import { useServiceHook } from "@/hooks/useServiceHook";
@@ -7,11 +6,12 @@ import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { LoginScreen } from "@/components/auth/LoginScreen";
 import { SetupScreen } from "@/components/auth/SetupScreen";
 import App from "@/App.tsx";
-import { SessionService } from "@/services/SessionService";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AuthPhase = "loading" | "app" | "setup" | "login" | "error";
 
 export function AuthInitializer() {
+  const { isAuthenticated } = useAuth();
   const [phase, setPhase] = useState<AuthPhase>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -30,7 +30,7 @@ export function AuthInitializer() {
         return;
       }
 
-      if (SessionService.isAuthenticated()) {
+      if (isAuthenticated) {
         try {
           await validateMe();
           setPhase("app");
@@ -40,9 +40,6 @@ export function AuthInitializer() {
           const statusCode = axiosError?.response?.status;
 
           if (statusCode === 401 || statusCode === 403) {
-            SessionService.clearToken();
-            toast.error("Sessão inválida ou expirada. Faça login novamente.");
-          } else {
             throw err;
           }
         }
@@ -66,8 +63,8 @@ export function AuthInitializer() {
 
   useEffect(() => {
     initializeAuth();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   if (phase === "loading") {
     return <LoadingScreen message="Verificando configuração..." />;

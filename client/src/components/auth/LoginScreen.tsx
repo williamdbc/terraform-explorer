@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FaLayerGroup } from "react-icons/fa";
 import { SessionService } from "@/services/SessionService";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function LoginScreen() {
   const [form, setForm] = useState<LoginRequest>({
@@ -19,18 +20,20 @@ export function LoginScreen() {
     AuthService.login(data)
   );
 
+  const { refreshAuth } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.username.trim() || !form.password.trim()) {
-      toast.error("Preencha usuário e senha");
+      toast.error("Preencha usuário e senha.");
       return;
     }
 
     const response = await login(form);
     SessionService.setToken(response.accessToken);
-    toast.success("Login realizado com sucesso!");
-    window.location.reload();
+    refreshAuth();
+    toast.success("Login realizado com sucesso.");
   };
 
   return (
