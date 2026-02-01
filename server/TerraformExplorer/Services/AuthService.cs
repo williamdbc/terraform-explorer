@@ -14,15 +14,17 @@ public class AuthService
 {
     private readonly UserRepository _userRepository;
     private readonly AuthSettings _authSettings;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthService(
-        UserRepository userRepository, 
-        AuthSettings authSettings)
+        UserRepository userRepository,
+        AuthSettings authSettings,
+        IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _authSettings = authSettings;
+        _httpContextAccessor = httpContextAccessor;
     }
-
     public async Task<HasUserResponse> HasUser()
     {
         var hasUser = await _userRepository.Any();
@@ -32,10 +34,11 @@ public class AuthService
     public async Task<RegisterResponse> Register(RegisterRequest request)
     {
         if (await _userRepository.Any())
-            throw new InvalidOperationException("User already exists.");
+            throw new InvalidOperationException("O sistema já possui um usuário registrado.");
 
         var user = new User
         {
+            DisplayName = request.DisplayName,
             Username = request.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             CreatedAt = DateTime.UtcNow
@@ -53,10 +56,10 @@ public class AuthService
     public async Task<LoginResponse> Login(LoginRequest request)
     {
         var user = await _userRepository.GetByUsername(request.Username)
-                   ?? throw new BusinessException("User not found.");
+                   ?? throw new BusinessException("Usuario ou senha inválidos.");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            throw new BusinessException("Invalid credentials.");
+            throw new BusinessException("Usuário ou senha inválidos.");
         
         return GenerateLoginResponse(user);
     }
@@ -67,7 +70,7 @@ public class AuthService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+            new Claim(JwtRegisteredClaimNames.Sub, user.DisplayName),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Role, "Admin")
         };
@@ -90,6 +93,35 @@ public class AuthService
         {
             AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
             ExpiresIn = (int)(expires - DateTime.UtcNow).TotalSeconds
+        };
+    }
+    
+    public async Task<MeResponse> GetCurrentUser()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+
+        if (user == null || !user.Identity?.IsAuthenticated == true)
+        {
+            throw new UnauthorizedAccessException("Usuário não autenticado.");
+        }
+
+        var usernameClaim = user.FindFirst(ClaimTypes.Name)?.Value
+                            ?? user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+        if (string.IsNullOrEmpty(usernameClaim))
+        {
+            throw new UnauthorizedAccessException("Não foi possível identificar o usuário no token.");
+        }
+
+        var dbUser = await _userRepository.GetByUsername(usernameClaim)
+                     ?? throw new UnauthorizedAccessException("Usuário não encontrado ou foi removido.");
+
+        return new MeResponse
+        {
+            Id = dbUser.Id.ToString(),
+            Username = dbUser.Username,
+            DisplayName = dbUser.Username,
+            CreatedAt = dbUser.CreatedAt
         };
     }
 

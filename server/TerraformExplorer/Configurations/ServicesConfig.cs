@@ -11,6 +11,7 @@ public static class ServicesConfig
     {
         builder.Services.AddHealthChecks();
         builder.Services.AddMemoryCache();
+        builder.Services.AddHttpContextAccessor();
         
         builder.Services.AddScoped<TerraformService>();
         builder.Services.AddScoped<AwsCredentialsService>();
@@ -22,6 +23,5 @@ public static class ServicesConfig
         builder.Services.AddScoped<ProjectGroupService>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<UserRepository>();
-        
     }
 }

@@ -43,7 +43,7 @@ public class ProjectController : ControllerBase
     public IActionResult Delete(string accountName, string moduleName, string projectName)
     {
         _projectService.Delete(accountName, moduleName, projectName);
-        return Ok(new SuccessResponse { Message = $"Project '{projectName}' deleted from module '{moduleName}' in account '{accountName}'." });
+        return Ok(new SuccessResponse { Message = $"Projeto '{projectName}' deletado do módulo '{moduleName}' na conta '{accountName}'." });
     }
 
     [HttpPost("copy")]

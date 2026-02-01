@@ -6,7 +6,6 @@ using TerraformExplorer.Models.Responses;
 namespace TerraformExplorer.Controllers;
 
 [ApiController]
-[AllowAnonymous]
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
@@ -22,5 +21,13 @@ public class AuthController : ControllerBase
     {
         var response = await _authService.Login(request);
         return Ok(response);
+    }
+    
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<MeResponse>> GetCurrentUser()
+    {
+        var userInfo = await _authService.GetCurrentUser();
+        return Ok(userInfo);
     }
 }
