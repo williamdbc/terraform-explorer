@@ -63,7 +63,7 @@ export function ModulesTable() {
     if (!moduleToDelete) return;
 
     await deleteModule(moduleToDelete);
-    toast.success(`Módulo "${moduleToDelete}" excluído com sucesso`);
+    toast.success(`Módulo "${moduleToDelete}" excluído com sucesso.`);
     closeDeleteConfirm();
     loadStructure();
   };

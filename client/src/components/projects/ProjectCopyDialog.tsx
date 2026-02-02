@@ -87,15 +87,15 @@ export function ProjectCopyDialog({
 
   const validateForm = (): boolean => {
     if (!formData.destination.accountName.trim()) {
-      toast.error("Conta destino é obrigatória");
+      toast.error("Conta destino é obrigatória.");
       return false;
     }
     if (!formData.destination.moduleName.trim()) {
-      toast.error("Grupo de projetos de destino é obrigatório");
+      toast.error("Grupo de projetos de destino é obrigatório.");
       return false;
     }
     if (!formData.destination.projectName.trim()) {
-      toast.error("Nome do projeto destino é obrigatório");
+      toast.error("Nome do projeto destino é obrigatório.");
       return false;
     }
     return true;
@@ -111,7 +111,7 @@ export function ProjectCopyDialog({
     setConfirmOpen(false);
 
     await copyProject(formData);
-    toast.success("Projeto copiado com sucesso");
+    toast.success("Projeto copiado com sucesso.");
     onCopySuccess?.();
     onClose();
     updateDestinationField("projectName", "");

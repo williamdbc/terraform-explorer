@@ -58,11 +58,11 @@ export function ProjectsTable() {
 
   const openCreateDialog = () => {
     if (!selectedAccount) {
-      toast.error("Selecione uma conta primeiro");
+      toast.error("Selecione uma conta primeiro.");
       return;
     }
     if (!selectedProjectGroup) {
-      toast.error("Selecione um grupo de projetos primeiro");
+      toast.error("Selecione um grupo de projetos primeiro.");
       return;
     }
     setShowCreate(true);
@@ -119,7 +119,7 @@ export function ProjectsTable() {
     if (!projectToDelete || !selectedAccount || !selectedProjectGroup) return;
 
     await deleteProject([selectedAccount, selectedProjectGroup, projectToDelete]);
-    toast.success(`Projeto "${projectToDelete}" excluído com sucesso`);
+    toast.success(`Projeto "${projectToDelete}" excluído com sucesso.`);
     closeDeleteConfirm();
     loadStructure();
   };

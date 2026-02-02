@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TerraformExplorer.Models;
 using TerraformExplorer.Models.Requests;
@@ -9,6 +10,7 @@ using TerraformExplorer.Services;
 namespace TerraformExplorer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/terraform")]
 public class TerraformController : ControllerBase
 {

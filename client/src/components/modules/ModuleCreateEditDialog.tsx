@@ -51,11 +51,11 @@ export function ModuleCreateEditDialog({
 
   const validateForm = () => {
     if (!moduleName.trim()) {
-      toast.error("Nome do módulo é obrigatório");
+      toast.error("Nome do módulo é obrigatório.");
       return false;
     }
     if (mode === "edit" && moduleName.trim() === initialName) {
-      toast("Nenhuma alteração feita no nome");
+      toast("Nenhuma alteração feita no nome.");
       return false;
     }
     return true;
@@ -72,11 +72,11 @@ export function ModuleCreateEditDialog({
 
     if (mode === "create") {
       await createModule({ name: moduleName.trim() });
-      toast.success("Módulo criado com sucesso");
+      toast.success("Módulo criado com sucesso.");
       onCreateSuccess?.();
     } else {
       await renameModule([initialName, { newName: moduleName.trim() }]);
-      toast.success("Módulo renomeado com sucesso");
+      toast.success("Módulo renomeado com sucesso.");
       onEditSuccess?.();
     }
 

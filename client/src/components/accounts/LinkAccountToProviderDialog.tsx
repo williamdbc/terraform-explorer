@@ -67,11 +67,11 @@ export function LinkAccountToProviderDialog({
 
   const validateForm = (): boolean => {
     if (!formData.profile.trim()) {
-      toast.error("Profile é obrigatório");
+      toast.error("Profile é obrigatório.");
       return false;
     }
     if (!formData.region.trim()) {
-      toast.error("Region é obrigatório");
+      toast.error("Region é obrigatório.");
       return false;
     }
     return true;
@@ -95,7 +95,7 @@ export function LinkAccountToProviderDialog({
       },
     ]);
 
-    toast.success(`Provider linkado à conta "${accountName}" com sucesso`);
+    toast.success(`Provider linkado à conta "${accountName}" com sucesso.`);
     onLinkSuccess?.();
     onClose();
     setFormData(initialFormData);

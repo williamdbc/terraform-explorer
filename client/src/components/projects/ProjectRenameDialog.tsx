@@ -64,7 +64,7 @@ export function ProjectRenameDialog({
     setConfirmOpen(false);
 
     await renameProject(newName.trim());
-    toast.success(`Projeto renomeado para "${newName.trim()}"`);
+    toast.success(`Projeto renomeado para "${newName.trim()}".`);
     onRenameSuccess?.(newName.trim());
     onClose();
   };

@@ -58,7 +58,7 @@ export function ProjectGroupTable() {
 
   const openCreateDialog = () => {
     if (!selectedAccount) {
-      toast.error("Selecione uma conta primeiro");
+      toast.error("Selecione uma conta primeiro.");
       return;
     }
     setEditingModuleName(null);
@@ -109,7 +109,7 @@ export function ProjectGroupTable() {
     if (!moduleToDelete || !selectedAccount) return;
 
     await deleteUsedModule([selectedAccount, moduleToDelete]);
-    toast.success(`Grupo de projetos "${moduleToDelete}" excluído com sucesso`);
+    toast.success(`Grupo de projetos "${moduleToDelete}" excluído com sucesso.`);
     closeDeleteConfirm();
     loadStructure();
   };
