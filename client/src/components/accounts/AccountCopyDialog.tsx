@@ -66,11 +66,11 @@ export function AccountCopyDialog({
 
   const validateForm = (): boolean => {
     if (!formData.sourceAccountName.trim()) {
-      toast.error("Conta de origem é obrigatória");
+      toast.error("Conta de origem é obrigatória.");
       return false;
     }
     if (!formData.destinationAccountName.trim()) {
-      toast.error("Nome da nova conta é obrigatório");
+      toast.error("Nome da nova conta é obrigatório.");
       return false;
     }
     return true;
@@ -86,7 +86,7 @@ export function AccountCopyDialog({
     setConfirmOpen(false);
     
     await copyAccount(formData);
-    toast.success(`Conta "${formData.sourceAccountName}" copiada para "${formData.destinationAccountName}"`);
+    toast.success(`Conta "${formData.sourceAccountName}" copiada para "${formData.destinationAccountName}."`);
     onCopySuccess?.();
     updateField("destinationAccountName", "");
     onClose();

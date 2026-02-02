@@ -45,12 +45,12 @@ export function FileRenameDialog({
     const trimmed = newFileName.trim();
 
     if (!trimmed) {
-      toast.error("Nome do arquivo é obrigatório");
+      toast.error("Nome do arquivo é obrigatório.");
       return;
     }
 
     if (trimmed === fileName) {
-      toast("Nenhuma alteração no nome");
+      toast("Nenhuma alteração no nome.");
       return;
     }
 
@@ -64,7 +64,7 @@ export function FileRenameDialog({
     const newPath = dir ? `${dir}/${newFileName.trim()}` : newFileName.trim();
 
     await renameFile({ oldPath, newPath });
-    toast.success(`Arquivo renomeado para "${newFileName.trim()}"`);
+    toast.success(`Arquivo renomeado para "${newFileName.trim()}".`);
     onRenameSuccess(newPath, newFileName.trim());
     onClose();
   };

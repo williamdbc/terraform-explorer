@@ -86,7 +86,7 @@ export function ExecuteAllModal({
     });
 
     setActiveTab(results[0]?.workingDir || null);
-    toast.success(`Executado "${cmd}" em ${results.length} projeto(s)`);
+    toast.success(`Executado "${cmd}" em ${results.length} projeto(s).`);
   };
 
   const handleClearTab = (tab: string) => {

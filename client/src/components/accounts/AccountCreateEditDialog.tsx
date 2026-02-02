@@ -56,12 +56,12 @@ export function AccountCreateEditDialog({
 
   const validateForm = (): boolean => {
     if (!accountName.trim()) {
-      toast.error("Nome da conta é obrigatório");
+      toast.error("Nome da conta é obrigatório.");
       return false;
     }
 
     if (mode === "edit" && accountName.trim() === initialName) {
-      toast("Nenhuma alteração feita no nome");
+      toast("Nenhuma alteração feita no nome.");
       return false;
     }
 
@@ -79,11 +79,11 @@ export function AccountCreateEditDialog({
 
     if (mode === "create") {
       await createAccount({ name: accountName.trim() });
-      toast.success("Conta criada com sucesso");
+      toast.success("Conta criada com sucesso.");
       onCreateSuccess?.();
     } else {
       await renameAccount([initialName, { newName: accountName.trim() }]);
-      toast.success("Conta renomeada com sucesso");
+      toast.success("Conta renomeada com sucesso.");
       onEditSuccess?.();
     }
     

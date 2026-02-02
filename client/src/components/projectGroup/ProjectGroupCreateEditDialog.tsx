@@ -61,15 +61,15 @@ export function ProjectGroupCreateEditDialog({
 
   const validateForm = (): boolean => {
     if (mode === "create" && !selectedAccount) {
-      toast.error("Conta é obrigatória");
+      toast.error("Conta é obrigatória.");
       return false;
     }
     if (!moduleName.trim()) {
-      toast.error("Nome do módulo é obrigatório");
+      toast.error("Nome do módulo é obrigatório.");
       return false;
     }
     if (mode === "edit" && moduleName.trim() === initialName) {
-      toast("Nenhuma alteração feita no nome");
+      toast("Nenhuma alteração feita no nome.");
       return false;
     }
     return true;
@@ -86,11 +86,11 @@ export function ProjectGroupCreateEditDialog({
 
     if (mode === "create") {
       await createModule([selectedAccount, { name: moduleName.trim() }]);
-      toast.success("Grupo de projetos criado com sucesso");
+      toast.success("Grupo de projetos criado com sucesso.");
       onCreateSuccess?.();
     } else {
       await renameModule([accountName, initialName, { newName: moduleName.trim() }]);
-      toast.success("Grupo de projetos renomeado com sucesso");
+      toast.success("Grupo de projetos renomeado com sucesso.");
       onEditSuccess?.();
     }
     onClose();

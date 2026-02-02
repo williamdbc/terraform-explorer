@@ -45,7 +45,7 @@ export function ProvidersTable() {
     if (!providerToDelete) return;
 
     await deleteProvider(providerToDelete);
-    toast.success(`Provider "${providerToDelete}" excluído com sucesso`);
+    toast.success(`Provider "${providerToDelete}" excluído com sucesso.`);
     setConfirmDeleteOpen(false);
     setProviderToDelete(null);
     loadStructure();
