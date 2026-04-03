@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using TerraformExplorer.Repositories;
 using TerraformExplorer.Services;
 
 namespace TerraformExplorer.Configurations;
@@ -11,6 +12,8 @@ public static class ServicesConfig
         builder.Services.AddHealthChecks();
         builder.Services.AddMemoryCache();
 
+        builder.Services.AddHttpContextAccessor();
+        
         builder.Services.AddScoped<TerraformService>();
         builder.Services.AddScoped<AwsCredentialsService>();
         builder.Services.AddScoped<AccountService>();
@@ -21,5 +24,7 @@ public static class ServicesConfig
         builder.Services.AddScoped<ProjectGroupService>();
         builder.Services.AddScoped<GitService>();
         builder.Services.AddHostedService<AutoCommitService>();
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<UserRepository>();
     }
 }

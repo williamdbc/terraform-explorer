@@ -9,6 +9,8 @@ public static class SettingsConfig
     {
         builder.Services.AddValidatedSingletonSettings<TerraformSettings>(builder.Configuration, "TerraformSettings");
         builder.Services.AddSingleton(BuildGitSettings(builder.Configuration));
+        builder.Services.AddValidatedSingletonSettings<DatabaseSettings>(builder.Configuration, "DatabaseSettings");
+        builder.Services.AddValidatedSingletonSettings<AuthSettings>(builder.Configuration, "AuthSettings");
     }
 
     private static GitSettings BuildGitSettings(IConfiguration configuration)
@@ -19,5 +21,6 @@ public static class SettingsConfig
         settings.UserName = configuration["GIT_USER_NAME"] ?? settings.UserName;
         settings.UserEmail = configuration["GIT_USER_EMAIL"] ?? settings.UserEmail;
         return settings;
+
     }
 }

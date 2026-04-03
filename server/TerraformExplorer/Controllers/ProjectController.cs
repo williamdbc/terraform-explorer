@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TerraformExplorer.Models.Requests;
 using TerraformExplorer.Models.Responses;
@@ -6,6 +7,7 @@ using TerraformExplorer.Services;
 namespace TerraformExplorer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/projects")]
 public class ProjectController : ControllerBase
 {
@@ -41,7 +43,7 @@ public class ProjectController : ControllerBase
     public IActionResult Delete(string accountName, string moduleName, string projectName)
     {
         _projectService.Delete(accountName, moduleName, projectName);
-        return Ok(new SuccessResponse { Message = $"Project '{projectName}' deleted from module '{moduleName}' in account '{accountName}'." });
+        return Ok(new SuccessResponse { Message = $"Projeto '{projectName}' deletado do módulo '{moduleName}' na conta '{accountName}'." });
     }
 
     [HttpPost("copy")]

@@ -97,7 +97,7 @@ export function AccountsTable() {
     if (!accountToDelete) return;
     
     await deleteAccount(accountToDelete);
-    toast.success(`Conta "${accountToDelete}" excluída com sucesso`);
+    toast.success(`Conta "${accountToDelete}" excluída com sucesso.`);
     closeDeleteConfirm();
     loadStructure();
   };

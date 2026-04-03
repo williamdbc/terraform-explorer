@@ -23,7 +23,7 @@ export default function App() {
     setLocalLoading(true);
     return loadStructure()
       .then(() => {
-        toast.success("Estrutura carregada com sucesso");
+        toast.success("Estrutura carregada com sucesso.");
       })
       .finally(() => {
         setLocalLoading(false);

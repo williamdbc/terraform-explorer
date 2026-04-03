@@ -18,7 +18,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       position="top-right"
       toastOptions={{
         duration: 5000,
-        // closeButton: true,
+        closeButton: true,
         classNames: {
           toast: "!text-sm",
           success: "!bg-green-600 !text-white !border-green-700",

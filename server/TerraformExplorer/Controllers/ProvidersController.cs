@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TerraformExplorer.Models.Requests;
 using TerraformExplorer.Models.Responses;
 using TerraformExplorer.Services;
@@ -6,6 +7,7 @@ using TerraformExplorer.Services;
 namespace TerraformExplorer.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/providers")]
 public class ProvidersController : ControllerBase
 {

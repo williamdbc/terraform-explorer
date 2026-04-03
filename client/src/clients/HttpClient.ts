@@ -1,3 +1,4 @@
+import { SessionService } from '@/services/SessionService';
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
@@ -14,14 +15,18 @@ export default class HttpClient {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    // this.instance.interceptors.request.use((config) => {
-    //   config.headers.Accept = '*/*';
-    //   const token = SessionService.getToken();
-    //   if (token) {
-    //     config.headers.Authorization = `Bearer ${token}`;
-    //   }
-    //   return config;
-    // });
+    this.instance.interceptors.request.use(
+      (config) => {
+        config.headers.Accept = '*/*';
+        const token = SessionService.getToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
 
     this.instance.interceptors.response.use(
       (response) => response,
@@ -31,7 +36,7 @@ export default class HttpClient {
           const code = error.code;
     
           if (status === 401) {
-            // SessionService.handleExpiredSession();
+            SessionService.handleExpiredSession();
           } else if (code === "ERR_NETWORK") {
             console.error("Erro de rede:", error.message);
           } else if (status && status >= 500) {

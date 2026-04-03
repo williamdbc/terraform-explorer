@@ -4,7 +4,8 @@ import {
   FaCubes,
   FaCloud,
   FaFolderOpen,
-  FaRocket
+  FaRocket,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { ButtonWithTooltip } from "@/components/common/ButtonWithTooltipProps";
 import { LogoTitle } from "./LogoTitle";
@@ -12,6 +13,9 @@ import { GitButton } from "@/components/git/GitButton";
 import type { AppView } from "@/types/AppView";
 import { useContext } from "react";
 import { StructureContext } from "@/contexts/StructureContext";
+import { toast } from "sonner";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   setActiveView: (view: AppView) => void;
@@ -19,9 +23,16 @@ interface HeaderProps {
 
 export function Header({ setActiveView }: HeaderProps) {
   const { loadStructure } = useContext(StructureContext);
+  const currentUser = useCurrentUser();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    toast.info("Você saiu da conta.");
+  };
 
   return (
-    <header className="bg-linear-to-r from-slate-900 to-slate-800 text-white px-6 py-4 shadow-lg flex items-center">
+    <header className="bg-linear-to-r from-slate-900 to-slate-800 text-white px-6 py-4 shadow-lg flex items-center justify-between">
       <LogoTitle />
 
       <div className="grow flex items-center justify-center gap-3">
@@ -71,6 +82,24 @@ export function Header({ setActiveView }: HeaderProps) {
 
       <div className="w-1/4 flex justify-end">
         <GitButton />
+      <div className="flex items-center gap-4 w-1/4 justify-end">
+        {currentUser ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-slate-300">
+              Olá, <span className="font-medium text-white">{currentUser.displayName}</span>
+            </span>
+
+            <ButtonWithTooltip
+              text="Sair"
+              bgColorClass="bg-red-600 hover:bg-red-700"
+              ariaLabel="Sair da conta"
+              onClick={handleLogout}
+              icon={<FaSignOutAlt className="w-5 h-5" />}
+            />
+          </div>
+        ) : (
+          <span className="text-sm text-slate-400">Não autenticado</span>
+        )}
       </div>
     </header>
   );
