@@ -11,6 +11,7 @@ public static class ServicesConfig
     {
         builder.Services.AddHealthChecks();
         builder.Services.AddMemoryCache();
+
         builder.Services.AddHttpContextAccessor();
         
         builder.Services.AddScoped<TerraformService>();
@@ -21,6 +22,8 @@ public static class ServicesConfig
         builder.Services.AddScoped<FileSystemService>();
         builder.Services.AddScoped<ModuleService>();
         builder.Services.AddScoped<ProjectGroupService>();
+        builder.Services.AddScoped<GitService>();
+        builder.Services.AddHostedService<AutoCommitService>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<UserRepository>();
     }

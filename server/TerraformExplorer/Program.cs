@@ -18,4 +18,6 @@ app.UseCorsConfiguration();
 app.ConfigureMiddlewares();
 app.InitializeDatabase();
 
+await app.InitializeGitAsync();
+
 app.Run();
