@@ -15,4 +15,6 @@ var app = builder.Build();
 app.UseCorsConfiguration();
 app.ConfigureMiddlewares();
 
+await app.InitializeGitAsync();
+
 app.Run();

@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { ButtonWithTooltip } from "@/components/common/ButtonWithTooltipProps";
 import { LogoTitle } from "./LogoTitle";
+import { GitButton } from "@/components/git/GitButton";
 import type { AppView } from "@/types/AppView";
 import { useContext } from "react";
 import { StructureContext } from "@/contexts/StructureContext";
@@ -68,7 +69,9 @@ export function Header({ setActiveView }: HeaderProps) {
         />
       </div>
 
-      <div className="w-1/4" />
+      <div className="w-1/4 flex justify-end">
+        <GitButton />
+      </div>
     </header>
   );
 }

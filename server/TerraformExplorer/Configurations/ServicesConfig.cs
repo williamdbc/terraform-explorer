@@ -10,7 +10,7 @@ public static class ServicesConfig
     {
         builder.Services.AddHealthChecks();
         builder.Services.AddMemoryCache();
-        
+
         builder.Services.AddScoped<TerraformService>();
         builder.Services.AddScoped<AwsCredentialsService>();
         builder.Services.AddScoped<AccountService>();
@@ -19,5 +19,7 @@ public static class ServicesConfig
         builder.Services.AddScoped<FileSystemService>();
         builder.Services.AddScoped<ModuleService>();
         builder.Services.AddScoped<ProjectGroupService>();
+        builder.Services.AddScoped<GitService>();
+        builder.Services.AddHostedService<AutoCommitService>();
     }
 }

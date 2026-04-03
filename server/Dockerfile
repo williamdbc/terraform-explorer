@@ -13,7 +13,7 @@ WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:5000
 
 RUN apt-get update && \
-    apt-get install -y wget unzip && \
+    apt-get install -y wget unzip git && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip -O /tmp/terraform.zip && \
