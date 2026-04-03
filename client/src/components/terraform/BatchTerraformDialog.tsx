@@ -47,8 +47,8 @@ export function BatchTerraformDialog({
   const isMultiMode = !!onExecuteAll && selectedPaths.length > 0;
 
   const handleRunAll = async () => {
-    if (commands.length === 0) return toast.error("Nenhum comando válido para executar");
-    if (!isSingleMode && !isMultiMode) return toast.error("Nenhuma função de execução configurada");
+    if (commands.length === 0) return toast.error("Nenhum comando válido para executar.");
+    if (!isSingleMode && !isMultiMode) return toast.error("Nenhuma função de execução configurada.");
 
     toast.info(`Iniciando sequência de ${commands.length} comando(s)...`);
 

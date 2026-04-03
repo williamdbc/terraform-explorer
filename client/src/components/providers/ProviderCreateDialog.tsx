@@ -47,17 +47,17 @@ export function ProviderCreateDialog({
     e.preventDefault();
 
     if (!formData.profileName.trim()) {
-      toast.error("Nome do profile é obrigatório");
+      toast.error("Nome do profile é obrigatório.");
       return;
     }
 
     if (!formData.accessKeyId.trim()) {
-      toast.error("Access Key ID é obrigatório");
+      toast.error("Access Key ID é obrigatório.");
       return;
     }
 
     if (!formData.secretAccessKey.trim()) {
-      toast.error("Secret Access Key é obrigatório");
+      toast.error("Secret Access Key é obrigatório.");
       return;
     }
 
@@ -73,7 +73,7 @@ export function ProviderCreateDialog({
       secretAccessKey: formData.secretAccessKey.trim(),
       region: formData.region?.trim() || undefined,
     });
-    toast.success("Provider criado com sucesso");
+    toast.success("Provider criado com sucesso.");
     onCreateSuccess?.();
     onClose();
     setFormData({

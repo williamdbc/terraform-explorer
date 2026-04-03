@@ -66,9 +66,9 @@ export function FileCreateDialog({
 
   const openSaveConfirm = () => {
     const trimmed = fileName.trim();
-    if (!trimmed) return toast.error("Nome do arquivo é obrigatório");
+    if (!trimmed) return toast.error("Nome do arquivo é obrigatório.");
     if (!trimmed.match(/^[a-zA-Z0-9._-]+$/))
-      return toast.error("Nome inválido (use apenas letras, números, _, -, .)");
+      return toast.error("Nome inválido (use apenas letras, números, _, -, .).");
     setConfirmSaveOpen(true);
   };
 
@@ -76,7 +76,7 @@ export function FileCreateDialog({
     setConfirmSaveOpen(false);
     
     await createFile({ path: fullPath, content });
-    toast.success(`"${fileName}" criado com sucesso`);
+    toast.success(`"${fileName}" criado com sucesso.`);
     onCreateSuccess?.();
     onClose();
   };

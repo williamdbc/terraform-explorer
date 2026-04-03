@@ -164,7 +164,7 @@ export function FileEditorDialog({
     await saveFile({ path: filePath, content });
     setOriginalContent(content);
     setModified(false);
-    toast.success(`"${fileName}" salvo com sucesso`);
+    toast.success(`"${fileName}" salvo com sucesso.`);
     onSaveSuccess?.();
   };
 
@@ -177,14 +177,14 @@ export function FileEditorDialog({
 
   const handleDelete = async () => {
     await deleteFile(filePath);
-    toast.success(`"${fileName}" excluído`);
+    toast.success(`"${fileName}" excluído.`);
     onDeleteSuccess?.();
     onClose();
   };
 
   const handleRenameSuccess = (newName: string) => {
     setFileName(newName);
-    toast.success(`Renomeado para "${newName}"`);
+    toast.success(`Renomeado para "${newName}".`);
     onSaveSuccess?.();
     onClose();
   };

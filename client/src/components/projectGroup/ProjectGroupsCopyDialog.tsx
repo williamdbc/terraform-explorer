@@ -102,11 +102,11 @@ export function ProjectGroupCopyDialog({
   const validateForm = (): boolean => {
     const d = formData.destination;
     if (!d.accountName.trim()) {
-      toast.error("Conta destino é obrigatória");
+      toast.error("Conta destino é obrigatória.");
       return false;
     }
     if (!d.groupName.trim()) {
-      toast.error("Nome do grupo de projetos de destino é obrigatório");
+      toast.error("Nome do grupo de projetos de destino é obrigatório.");
       return false;
     }
     return true;
@@ -122,7 +122,7 @@ export function ProjectGroupCopyDialog({
     setConfirmOpen(false);
 
     await copyUsedModule(formData);
-    toast.success("Grupo de projetos copiado com sucesso");
+    toast.success("Grupo de projetos copiado com sucesso.");
     onCopySuccess?.();
     onClose();
     updateDestinationField("groupName", "");
