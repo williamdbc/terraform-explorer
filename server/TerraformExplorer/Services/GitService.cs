@@ -130,7 +130,9 @@ public class GitService
 
         var statusResult = await RunGitAsync("status --porcelain");
         var changedFiles = ParsePorcelainStatus(statusResult.Output);
-        response.ChangedFiles = changedFiles.Select(f => f.Path).ToList();
+        response.ChangedFiles = changedFiles
+            .Select(f => new GitFileChange { Status = f.Status, Path = f.Path })
+            .ToList();
         response.ModifiedFiles = changedFiles.Count;
 
         if (!string.IsNullOrWhiteSpace(response.Branch))

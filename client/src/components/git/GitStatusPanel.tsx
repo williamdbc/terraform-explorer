@@ -3,7 +3,43 @@ import { toast } from "sonner";
 import { FaCodeBranch, FaArrowUp, FaArrowDown, FaGithub } from "react-icons/fa";
 import { GitService } from "@/services/GitService";
 import { getErrorMessage } from "@/utils/apiHandlerError";
-import type { GitStatusResponse } from "@/interfaces/responses/GitStatusResponse";
+import type { GitFileChange, GitStatusResponse } from "@/interfaces/responses/GitStatusResponse";
+
+const STATUS_CONFIG: Record<string, { symbol: string; color: string; label: string }> = {
+  A: { symbol: "+", color: "text-green-400",  label: "Adicionado" },
+  "?": { symbol: "+", color: "text-green-400", label: "Novo arquivo" },
+  M: { symbol: "~", color: "text-yellow-400", label: "Modificado" },
+  D: { symbol: "-", color: "text-red-400",    label: "Deletado" },
+  R: { symbol: "→", color: "text-blue-400",   label: "Renomeado" },
+};
+
+function Checkbox({ checked }: { checked: boolean }) {
+  return (
+    <span
+      className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors ${
+        checked ? "bg-blue-500 border-blue-500" : "border-gray-500"
+      }`}
+    >
+      {checked && (
+        <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white fill-current">
+          <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </span>
+  );
+}
+
+function FileStatusBadge({ status }: { status: string }) {
+  const cfg = STATUS_CONFIG[status] ?? { symbol: "?", color: "text-gray-400", label: status };
+  return (
+    <span
+      className={`shrink-0 w-4 text-center font-mono font-bold text-xs ${cfg.color}`}
+      title={cfg.label}
+    >
+      {cfg.symbol}
+    </span>
+  );
+}
 
 const INTERVAL_OPTIONS = [
   { label: "30s", value: 30 },
@@ -31,28 +67,28 @@ export function GitStatusPanel({
   onPushRequest,
   onPullRequest,
 }: GitStatusPanelProps) {
-  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
   const [loadingClone, setLoadingClone] = useState(false);
 
-  const allFiles = status?.changedFiles ?? [];
+  const allFiles: GitFileChange[] = status?.changedFiles ?? [];
   const isReady = status?.isInitialized ?? false;
-  const allSelected = allFiles.length > 0 && selectedFiles.size === allFiles.length;
+  const allSelected = allFiles.length > 0 && selectedPaths.size === allFiles.length;
 
-  // Sync selection when file list changes
+  // Sync selection when file list changes — select all by default
   useEffect(() => {
-    setSelectedFiles(new Set(allFiles));
-  }, [status?.changedFiles?.join(",")]);
+    setSelectedPaths(new Set(allFiles.map((f) => f.path)));
+  }, [allFiles.map((f) => f.path).join(",")]);
 
-  const toggleFile = (file: string) => {
-    setSelectedFiles((prev) => {
+  const toggleFile = (path: string) => {
+    setSelectedPaths((prev) => {
       const next = new Set(prev);
-      next.has(file) ? next.delete(file) : next.add(file);
+      next.has(path) ? next.delete(path) : next.add(path);
       return next;
     });
   };
 
   const toggleAll = () => {
-    setSelectedFiles(allSelected ? new Set() : new Set(allFiles));
+    setSelectedPaths(allSelected ? new Set() : new Set(allFiles.map((f) => f.path)));
   };
 
   const handleClone = async () => {
@@ -89,7 +125,7 @@ export function GitStatusPanel({
     }
   };
 
-  const selectedCount = selectedFiles.size;
+  const selectedCount = selectedPaths.size;
 
   return (
     <>
@@ -151,19 +187,7 @@ export function GitStatusPanel({
                   onClick={toggleAll}
                   className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
                 >
-                  <span
-                    className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                      allSelected
-                        ? "bg-blue-500 border-blue-500"
-                        : "border-gray-500"
-                    }`}
-                  >
-                    {allSelected && (
-                      <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white fill-current">
-                        <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </span>
+                  <Checkbox checked={allSelected} />
                   Marcar todos
                 </button>
               )}
@@ -174,28 +198,18 @@ export function GitStatusPanel({
             ) : (
               <ul className="max-h-40 overflow-y-auto px-2 pb-2 space-y-0.5">
                 {allFiles.map((file) => (
-                  <li key={file}>
-                    <label className="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-700 cursor-pointer group">
+                  <li key={file.path}>
+                    <label
+                      onClick={() => toggleFile(file.path)}
+                      className="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-700 cursor-pointer group"
+                    >
+                      <Checkbox checked={selectedPaths.has(file.path)} />
+                      <FileStatusBadge status={file.status} />
                       <span
-                        onClick={() => toggleFile(file)}
-                        className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
-                          selectedFiles.has(file)
-                            ? "bg-blue-500 border-blue-500"
-                            : "border-gray-500 group-hover:border-gray-400"
-                        }`}
-                      >
-                        {selectedFiles.has(file) && (
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-white fill-current">
-                            <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        )}
-                      </span>
-                      <span
-                        onClick={() => toggleFile(file)}
                         className="text-xs font-mono text-gray-300 truncate"
-                        title={file}
+                        title={file.path}
                       >
-                        {file}
+                        {file.path}
                       </span>
                     </label>
                   </li>
@@ -208,7 +222,7 @@ export function GitStatusPanel({
         {/* Action buttons */}
         <div className="px-4 py-3 flex gap-2 border-b border-slate-700">
           <button
-            onClick={() => onCommitRequest([...selectedFiles])}
+            onClick={() => onCommitRequest([...selectedPaths])}
             disabled={!isReady || selectedCount === 0}
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded px-2 py-1.5 text-xs font-medium transition-colors"
           >

@@ -26,17 +26,35 @@ export function GitButton() {
   const anyDialogOpenRef = useRef(false);
   anyDialogOpenRef.current = commitOpen || confirmPush || confirmPull;
 
+  const CACHE_KEY = "git_status_cache";
+
   const fetchStatus = async () => {
     try {
       const s = await GitService.getStatus();
       setStatus(s);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(s));
     } catch {}
   };
 
   useEffect(() => {
+    // Show cached status instantly while fetching fresh data
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try { setStatus(JSON.parse(cached)); } catch {}
+    }
+
     fetchStatus();
-    const interval = setInterval(fetchStatus, 30_000);
+    const interval = setInterval(fetchStatus, 10_000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Refetch immediately when the user switches back to this tab
+    const handler = () => {
+      if (document.visibilityState === "visible") fetchStatus();
+    };
+    document.addEventListener("visibilitychange", handler);
+    return () => document.removeEventListener("visibilitychange", handler);
   }, []);
 
   useEffect(() => {

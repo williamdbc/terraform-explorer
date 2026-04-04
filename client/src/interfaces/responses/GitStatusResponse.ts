@@ -1,3 +1,8 @@
+export interface GitFileChange {
+  status: string; // "M" | "A" | "D" | "R" | "?"
+  path: string;
+}
+
 export interface GitStatusResponse {
   isInitialized: boolean;
   branch: string;
@@ -6,5 +11,5 @@ export interface GitStatusResponse {
   isSynced: boolean;
   autoCommitEnabled: boolean;
   autoCommitIntervalSeconds: number;
-  changedFiles: string[];
+  changedFiles: GitFileChange[];
 }
