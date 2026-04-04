@@ -86,13 +86,13 @@ export function GitButton() {
       return <span className="text-xs text-gray-500">sem repo</span>;
     }
 
-    const parts: string[] = [status.branch];
-    if (status.unpushedCommits > 0) parts.push(`↑${status.unpushedCommits}`);
-    if (status.modifiedFiles > 0) parts.push(`*${status.modifiedFiles}`);
+    const color = status.modifiedFiles > 0 ? "text-yellow-400" : "text-green-400";
+    const count = status.modifiedFiles > 0 ? ` ${status.modifiedFiles}` : " ✓";
 
-    const color = status.isSynced ? "text-green-400" : "text-yellow-400";
     return (
-      <span className={`text-xs font-mono ${color}`}>{parts.join(" ")}</span>
+      <span className={`text-xs font-mono ${color}`}>
+        {status.branch}{count}
+      </span>
     );
   };
 

@@ -16,11 +16,102 @@ public class GitService
         _gitSettings = gitSettings;
     }
 
+    // ─── Repo state ───────────────────────────────────────────────────────────
+
     public bool IsRepoInitialized()
     {
         var gitDir = Path.Combine(_terraformSettings.GetRootPath(), ".git");
         return Directory.Exists(gitDir);
     }
+
+    // ─── Setup ────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Marks the repo root as a safe directory globally.
+    /// Fixes "dubious ownership" errors when the volume was cloned on the host
+    /// by a different user than the container's runtime user (root).
+    /// </summary>
+    public async Task ConfigureSafeDirectoryAsync()
+    {
+        var rootPath = _terraformSettings.GetRootPath();
+        // --global flag works from any working dir; we use /tmp to be safe
+        await RunGitInDirAsync($"config --global --add safe.directory {rootPath}", Path.GetTempPath());
+    }
+
+    public async Task ConfigureGitUserAsync()
+    {
+        if (!IsRepoInitialized()) return;
+
+        if (!string.IsNullOrWhiteSpace(_gitSettings.UserName))
+            await RunGitAsync($"config user.name \"{_gitSettings.UserName}\"");
+
+        if (!string.IsNullOrWhiteSpace(_gitSettings.UserEmail))
+            await RunGitAsync($"config user.email \"{_gitSettings.UserEmail}\"");
+    }
+
+    public void EnsureGitIgnore()
+    {
+        var gitIgnorePath = Path.Combine(_terraformSettings.GetRootPath(), ".gitignore");
+        var requiredEntries = new[] { ".aws/", ".terraform.d/", ".terraform-cache/" };
+
+        var existing = File.Exists(gitIgnorePath)
+            ? File.ReadAllLines(gitIgnorePath).ToHashSet(StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var toAdd = requiredEntries.Where(e => !existing.Contains(e)).ToList();
+        if (toAdd.Count > 0)
+            File.AppendAllLines(gitIgnorePath, toAdd);
+    }
+
+    // ─── Clone ────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Clones the configured remote repo into a temp dir, then moves just the
+    /// .git folder into the Terraform root — preserving any existing local files.
+    /// Immediately configures user and .gitignore without requiring a restart.
+    /// </summary>
+    public async Task CloneAsync()
+    {
+        if (IsRepoInitialized())
+            throw new BusinessException("O diretório já possui um repositório Git inicializado.");
+
+        if (string.IsNullOrWhiteSpace(_gitSettings.RepoUrl))
+            throw new BusinessException("URL do repositório não configurada (GIT_REPO_URL).");
+
+        var rootPath = _terraformSettings.GetRootPath();
+        var tmpDir = Path.Combine(Path.GetTempPath(), $"git-clone-{Guid.NewGuid():N}");
+
+        try
+        {
+            var authenticatedUrl = BuildAuthenticatedUrl();
+
+            // Clone into temp dir so we don't clobber existing files
+            var cloneResult = await RunGitInDirAsync(
+                $"clone --no-local \"{authenticatedUrl}\" \"{tmpDir}\"",
+                Path.GetTempPath()
+            );
+
+            if (cloneResult.ExitCode != 0)
+                throw new BusinessException($"Erro ao clonar: {cloneResult.Error}");
+
+            // Move only the .git folder into the root
+            var tmpGit = Path.Combine(tmpDir, ".git");
+            var rootGit = Path.Combine(rootPath, ".git");
+            Directory.Move(tmpGit, rootGit);
+
+            // Apply safe.directory, user config and .gitignore without restarting
+            await ConfigureSafeDirectoryAsync();
+            await ConfigureGitUserAsync();
+            EnsureGitIgnore();
+        }
+        finally
+        {
+            if (Directory.Exists(tmpDir))
+                Directory.Delete(tmpDir, true);
+        }
+    }
+
+    // ─── Status ───────────────────────────────────────────────────────────────
 
     public async Task<GitStatusResponse> GetStatusAsync()
     {
@@ -61,6 +152,8 @@ public class GitService
         return !string.IsNullOrWhiteSpace(result.Output);
     }
 
+    // ─── Operations ──────────────────────────────────────────────────────────
+
     public async Task CommitAsync(string? message = null, List<string>? files = null)
     {
         if (!IsRepoInitialized())
@@ -74,11 +167,9 @@ public class GitService
             ? BuildCommitMessage(statusResult.Output)
             : message;
 
-        var hasSelectedFiles = files != null && files.Count > 0;
-
-        if (hasSelectedFiles)
+        if (files != null && files.Count > 0)
         {
-            foreach (var file in files!)
+            foreach (var file in files)
                 await RunGitAsync($"add \"{EscapeForShell(file)}\"");
         }
         else
@@ -124,30 +215,7 @@ public class GitService
         return result.Output;
     }
 
-    public async Task ConfigureGitUserAsync()
-    {
-        if (!IsRepoInitialized()) return;
-
-        if (!string.IsNullOrWhiteSpace(_gitSettings.UserName))
-            await RunGitAsync($"config user.name \"{_gitSettings.UserName}\"");
-
-        if (!string.IsNullOrWhiteSpace(_gitSettings.UserEmail))
-            await RunGitAsync($"config user.email \"{_gitSettings.UserEmail}\"");
-    }
-
-    public void EnsureGitIgnore()
-    {
-        var gitIgnorePath = Path.Combine(_terraformSettings.GetRootPath(), ".gitignore");
-        var requiredEntries = new[] { ".aws/", ".terraform.d/", ".terraform-cache/" };
-
-        var existing = File.Exists(gitIgnorePath)
-            ? File.ReadAllLines(gitIgnorePath).ToHashSet(StringComparer.OrdinalIgnoreCase)
-            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        var toAdd = requiredEntries.Where(e => !existing.Contains(e)).ToList();
-        if (toAdd.Count > 0)
-            File.AppendAllLines(gitIgnorePath, toAdd);
-    }
+    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private string BuildAuthenticatedUrl()
     {
@@ -167,31 +235,28 @@ public class GitService
         var files = ParsePorcelainStatus(porcelainOutput);
 
         var modified = files.Where(f => f.Status == "M").Select(f => f.Path).ToList();
-        var added = files.Where(f => f.Status is "A" or "?").Select(f => f.Path).ToList();
-        var deleted = files.Where(f => f.Status == "D").Select(f => f.Path).ToList();
-        var renamed = files.Where(f => f.Status == "R").Select(f => f.Path).ToList();
+        var added    = files.Where(f => f.Status is "A" or "?").Select(f => f.Path).ToList();
+        var deleted  = files.Where(f => f.Status == "D").Select(f => f.Path).ToList();
+        var renamed  = files.Where(f => f.Status == "R").Select(f => f.Path).ToList();
 
         if (files.Count <= 5)
         {
             var parts = new List<string>();
             if (modified.Count > 0) parts.Add($"modified {string.Join(", ", modified)}");
-            if (added.Count > 0) parts.Add($"added {string.Join(", ", added)}");
-            if (deleted.Count > 0) parts.Add($"deleted {string.Join(", ", deleted)}");
-            if (renamed.Count > 0) parts.Add($"renamed {string.Join(", ", renamed)}");
+            if (added.Count    > 0) parts.Add($"added {string.Join(", ", added)}");
+            if (deleted.Count  > 0) parts.Add($"deleted {string.Join(", ", deleted)}");
+            if (renamed.Count  > 0) parts.Add($"renamed {string.Join(", ", renamed)}");
             return $"auto-commit: {string.Join("; ", parts)}";
         }
 
         var folders = files
             .Select(f => f.Path.Split('/').FirstOrDefault() ?? "root")
-            .Distinct()
-            .Take(3)
-            .Select(f => f + "/")
-            .ToList();
+            .Distinct().Take(3).Select(f => f + "/").ToList();
 
         var summary = new List<string>();
         if (modified.Count > 0) summary.Add($"{modified.Count} modified");
-        if (added.Count > 0) summary.Add($"{added.Count} added");
-        if (deleted.Count > 0) summary.Add($"{deleted.Count} deleted");
+        if (added.Count    > 0) summary.Add($"{added.Count} added");
+        if (deleted.Count  > 0) summary.Add($"{deleted.Count} deleted");
 
         return $"auto-commit: {files.Count} files changed ({string.Join(", ", summary)}) across {string.Join(", ", folders)}";
     }
@@ -214,9 +279,14 @@ public class GitService
     private static string EscapeForShell(string value) =>
         value.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
-    private async Task<(string Output, string Error, int ExitCode)> RunGitAsync(string arguments)
+    // ─── Process execution ───────────────────────────────────────────────────
+
+    private Task<(string Output, string Error, int ExitCode)> RunGitAsync(string arguments) =>
+        RunGitInDirAsync(arguments, _terraformSettings.GetRootPath());
+
+    private static async Task<(string Output, string Error, int ExitCode)> RunGitInDirAsync(
+        string arguments, string workingDir)
     {
-        var workingDir = _terraformSettings.GetRootPath();
         var psi = new ProcessStartInfo
         {
             FileName = "git",
@@ -232,7 +302,7 @@ public class GitService
         process.Start();
 
         var outputTask = process.StandardOutput.ReadToEndAsync();
-        var errorTask = process.StandardError.ReadToEndAsync();
+        var errorTask  = process.StandardError.ReadToEndAsync();
         await Task.WhenAll(outputTask, errorTask);
         await process.WaitForExitAsync();
 

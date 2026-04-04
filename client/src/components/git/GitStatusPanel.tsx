@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FaCodeBranch, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { FaCodeBranch, FaArrowUp, FaArrowDown, FaGithub } from "react-icons/fa";
 import { GitService } from "@/services/GitService";
 import { getErrorMessage } from "@/utils/apiHandlerError";
 import type { GitStatusResponse } from "@/interfaces/responses/GitStatusResponse";
@@ -32,6 +32,7 @@ export function GitStatusPanel({
   onPullRequest,
 }: GitStatusPanelProps) {
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [loadingClone, setLoadingClone] = useState(false);
 
   const allFiles = status?.changedFiles ?? [];
   const isReady = status?.isInitialized ?? false;
@@ -52,6 +53,19 @@ export function GitStatusPanel({
 
   const toggleAll = () => {
     setSelectedFiles(allSelected ? new Set() : new Set(allFiles));
+  };
+
+  const handleClone = async () => {
+    setLoadingClone(true);
+    try {
+      await GitService.clone();
+      toast.success("Repositório clonado com sucesso.");
+      onRefresh();
+    } catch (error) {
+      toast.error(getErrorMessage(error) ?? "Erro ao clonar repositório.");
+    } finally {
+      setLoadingClone(false);
+    }
   };
 
   const handleAutoCommitToggle = async () => {
@@ -81,12 +95,33 @@ export function GitStatusPanel({
     <>
       <div className="absolute right-0 top-full mt-2 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 text-sm">
 
-        {/* Branch status */}
+        {/* Branch status / no-repo state */}
         <div className="px-4 py-3 border-b border-slate-700">
           {!isReady ? (
-            <p className="text-gray-400 text-xs">
-              Nenhum repositório Git encontrado. Clone um repositório no diretório de dados para começar.
-            </p>
+            <div className="flex flex-col items-center gap-3 py-2">
+              <FaGithub className="w-8 h-8 text-gray-500" />
+              <p className="text-gray-400 text-xs text-center leading-relaxed">
+                Nenhum repositório encontrado.<br />
+                Clone usando a URL configurada em <span className="font-mono text-gray-300">GIT_REPO_URL</span>.
+              </p>
+              <button
+                onClick={handleClone}
+                disabled={loadingClone}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded px-3 py-2 text-xs font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                {loadingClone ? (
+                  <>
+                    <span className="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full" />
+                    Clonando...
+                  </>
+                ) : (
+                  <>
+                    <FaGithub className="w-3 h-3" />
+                    Clonar repositório
+                  </>
+                )}
+              </button>
+            </div>
           ) : (
             <div className="flex items-center gap-2 text-white">
               <FaCodeBranch className="text-gray-400 shrink-0" />

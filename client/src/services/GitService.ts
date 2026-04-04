@@ -32,4 +32,8 @@ export class GitService {
   static async setAutoCommit(enabled: boolean, intervalSeconds: number): Promise<SuccessResponse> {
     return this.getHttpClient().put<SuccessResponse>("/auto-commit", { enabled, intervalSeconds });
   }
+
+  static async clone(): Promise<SuccessResponse> {
+    return this.getHttpClient().post<SuccessResponse>("/clone");
+  }
 }

@@ -47,6 +47,13 @@ public class GitController : ControllerBase
         return Ok(new SuccessResponse { Message = output });
     }
 
+    [HttpPost("clone")]
+    public async Task<IActionResult> Clone()
+    {
+        await _gitService.CloneAsync();
+        return Ok(new SuccessResponse { Message = "Repositório clonado com sucesso." });
+    }
+
     [HttpPut("auto-commit")]
     public IActionResult UpdateAutoCommit([FromBody] GitAutoCommitSettingsRequest request)
     {

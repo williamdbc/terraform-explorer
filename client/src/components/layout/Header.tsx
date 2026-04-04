@@ -80,15 +80,13 @@ export function Header({ setActiveView }: HeaderProps) {
         />
       </div>
 
-      <div className="w-1/4 flex justify-end">
+      <div className="flex items-center gap-4 justify-end w-1/4">
         <GitButton />
-      <div className="flex items-center gap-4 w-1/4 justify-end">
         {currentUser ? (
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-300">
               Olá, <span className="font-medium text-white">{currentUser.displayName}</span>
             </span>
-
             <ButtonWithTooltip
               text="Sair"
               bgColorClass="bg-red-600 hover:bg-red-700"
