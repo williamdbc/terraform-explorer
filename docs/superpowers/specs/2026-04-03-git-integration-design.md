@@ -27,7 +27,7 @@ Add a global Git integration module to TerraformExplorer. A single Git repositor
 ### New Files
 
 ```
-server/TerraformExplorer/
+apps/api/src/TerraformExplorer/
 ├── Controllers/
 │   └── GitController.cs
 ├── Services/
@@ -154,7 +154,7 @@ Add `git` to the base image:
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 ```
 
-### docker-compose.yml
+### infra/docker-compose.yml
 
 Add environment variables to the API service:
 
@@ -186,7 +186,7 @@ GIT_USER_EMAIL=
 ### New Files
 
 ```
-client/src/
+apps/web/src/
 ├── components/git/
 │   ├── GitButton.tsx           # header button with status badge
 │   ├── GitStatusPanel.tsx      # dropdown panel with actions + file list

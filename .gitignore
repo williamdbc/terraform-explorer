@@ -105,6 +105,8 @@ build/
 .env
 .env.*
 !.env.example   # mantém o modelo de exemplo no repositório
+infra/env/*.env
+!infra/env/*.env.example
 
 # Cache / temp
 *.local
