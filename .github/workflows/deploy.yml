@@ -19,10 +19,17 @@ jobs:
       GIT_USER_NAME: ${{ secrets.GIT_USER_NAME_PRD }}
       GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL_PRD }}
       CREDENTIALS_ENCRYPTION_KEY: ${{ secrets.CREDENTIALS_ENCRYPTION_KEY_PRD }}
+      DATA_DIR: ${{ secrets.DATA_DIR_PRD }}
+      WORKSPACE_DIR: ${{ secrets.WORKSPACE_DIR_PRD }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Preparar diretórios persistentes
+        run: |
+          mkdir -p "$DATA_DIR"
+          mkdir -p "$WORKSPACE_DIR"
 
       - name: Preparar envs
         run: |
@@ -50,22 +57,29 @@ jobs:
         run: |
           docker compose -f infra/docker-compose.yml up -d --build
 
-  deploy-hml:
+  deploy-stg:
     if: startsWith(github.ref, 'refs/heads/release/')
     runs-on: ['self-hosted', 'stg']
-    environment: homologation
+    environment: staging
     env:
       ASPNETCORE_ENVIRONMENT: Development
-      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_HML }}
-      GIT_TOKEN: ${{ secrets.GIT_TOKEN_HML }}
-      GIT_REPO_URL: ${{ secrets.GIT_REPO_URL_HML }}
-      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME_HML }}
-      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL_HML }}
-      CREDENTIALS_ENCRYPTION_KEY: ${{ secrets.CREDENTIALS_ENCRYPTION_KEY_HML }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_STG }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN_STG }}
+      GIT_REPO_URL: ${{ secrets.GIT_REPO_URL_STG }}
+      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME_STG }}
+      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL_STG }}
+      CREDENTIALS_ENCRYPTION_KEY: ${{ secrets.CREDENTIALS_ENCRYPTION_KEY_STG }}
+      DATA_DIR: ${{ secrets.DATA_DIR_STG }}
+      WORKSPACE_DIR: ${{ secrets.WORKSPACE_DIR_STG }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Preparar diretórios persistentes
+        run: |
+          mkdir -p "$DATA_DIR"
+          mkdir -p "$WORKSPACE_DIR"
 
       - name: Preparar envs
         run: |
@@ -89,6 +103,6 @@ jobs:
           VITE_API_BASE_URL=${VITE_API_BASE_URL}
           EOF
 
-      - name: Subir containers HML
+      - name: Subir containers STG
         run: |
           docker compose -f infra/docker-compose.yml up -d --build
