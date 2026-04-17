@@ -52,7 +52,7 @@ jobs:
 
   deploy-hml:
     if: startsWith(github.ref, 'refs/heads/release/')
-    runs-on: ['self-hosted', 'hml']
+    runs-on: ['self-hosted', 'stg']
     environment: homologation
     env:
       ASPNETCORE_ENVIRONMENT: Development
