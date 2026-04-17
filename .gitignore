@@ -56,9 +56,7 @@ nunit-*.xml
 *.userosscache
 *.sln.docstates
 
-# ASP.NET Core environment files (não versionar configs locais)
-appsettings.json
-appsettings.*.json
+# ASP.NET Core local secrets
 secrets.json
 
 # Local database files
@@ -105,6 +103,11 @@ build/
 .env
 .env.*
 !.env.example   # mantém o modelo de exemplo no repositório
+infra/env/*.env
+infra/data/*
+!infra/data/.gitkeep
+infra/workspace/*
+!infra/workspace/.gitkeep
 
 # Cache / temp
 *.local

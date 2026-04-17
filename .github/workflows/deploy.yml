@@ -10,25 +10,98 @@ jobs:
   deploy-prod:
     if: github.ref == 'refs/heads/main'
     runs-on: ['self-hosted', 'prod']
+    environment: production
     env:
+      ASPNETCORE_ENVIRONMENT: Production
       VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_PRD }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN_PRD }}
+      GIT_REPO_URL: ${{ secrets.GIT_REPO_URL_PRD }}
+      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME_PRD }}
+      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL_PRD }}
+      CREDENTIALS_ENCRYPTION_KEY: ${{ secrets.CREDENTIALS_ENCRYPTION_KEY_PRD }}
+      DATA_DIR: ${{ secrets.DATA_DIR_PRD }}
+      WORKSPACE_DIR: ${{ secrets.WORKSPACE_DIR_PRD }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Subir containers (PROD)
+      - name: Preparar diretórios persistentes
         run: |
-          docker-compose up -d --build
+          mkdir -p "$DATA_DIR"
+          mkdir -p "$WORKSPACE_DIR"
 
-  deploy-hml:
+      - name: Preparar envs
+        run: |
+          mkdir -p infra/env
+
+          cat > infra/env/api.env <<EOF
+          ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+          ASPNETCORE_URLS=http://+:5000
+
+          TerraformSettings__RootPath=/app/workspace
+          TerraformSettings__CredentialsEncryptionKey=${CREDENTIALS_ENCRYPTION_KEY}
+          DatabaseSettings__ConnectionString=Data Source=/app/data/terraform.db
+
+          GIT_TOKEN=${GIT_TOKEN}
+          GIT_REPO_URL=${GIT_REPO_URL}
+          GIT_USER_NAME=${GIT_USER_NAME}
+          GIT_USER_EMAIL=${GIT_USER_EMAIL}
+          EOF
+
+          cat > infra/env/web.env <<EOF
+          VITE_API_BASE_URL=${VITE_API_BASE_URL}
+          EOF
+
+      - name: Subir containers PROD
+        run: |
+          docker compose -f infra/docker-compose.yml up -d --build
+
+  deploy-stg:
     if: startsWith(github.ref, 'refs/heads/release/')
     runs-on: ['self-hosted', 'stg']
     env:
-      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_HML }}
+      ASPNETCORE_ENVIRONMENT: Development
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_STG }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN_STG }}
+      GIT_REPO_URL: ${{ secrets.GIT_REPO_URL_STG }}
+      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME_STG }}
+      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL_STG }}
+      CREDENTIALS_ENCRYPTION_KEY: ${{ secrets.CREDENTIALS_ENCRYPTION_KEY_STG }}
+      DATA_DIR: ${{ secrets.DATA_DIR_STG }}
+      WORKSPACE_DIR: ${{ secrets.WORKSPACE_DIR_STG }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Subir containers (HML)
+      - name: Preparar diretórios persistentes
         run: |
-          docker-compose up -d --build
+          mkdir -p "$DATA_DIR"
+          mkdir -p "$WORKSPACE_DIR"
+
+      - name: Preparar envs
+        run: |
+          mkdir -p infra/env
+
+          cat > infra/env/api.env <<EOF
+          ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+          ASPNETCORE_URLS=http://+:5000
+
+          TerraformSettings__RootPath=/app/workspace
+          TerraformSettings__CredentialsEncryptionKey=${CREDENTIALS_ENCRYPTION_KEY}
+          DatabaseSettings__ConnectionString=Data Source=/app/data/terraform.db
+
+          GIT_TOKEN=${GIT_TOKEN}
+          GIT_REPO_URL=${GIT_REPO_URL}
+          GIT_USER_NAME=${GIT_USER_NAME}
+          GIT_USER_EMAIL=${GIT_USER_EMAIL}
+          EOF
+
+          cat > infra/env/web.env <<EOF
+          VITE_API_BASE_URL=${VITE_API_BASE_URL}
+          EOF
+
+      - name: Subir containers STG
+        run: |
+          docker compose -f infra/docker-compose.yml up -d --build
