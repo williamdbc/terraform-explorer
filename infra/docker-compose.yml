@@ -1,0 +1,43 @@
+name: terraform-explorer
+
+services:
+  api:
+    image: terraform-explorer-api
+    container_name: terraform-explorer-api
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    env_file:
+      - ./env/api.env
+    ports:
+      - "5179:5000"
+    volumes:
+      - ./data:/app/data
+      - ./terraform:/app/terraform
+    working_dir: /app
+    networks:
+      - terraform-explorer-network
+    restart: always
+
+  web:
+    image: terraform-explorer-web
+    container_name: terraform-explorer-web
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5179/api
+    env_file:
+      - ./env/web.env
+    ports:
+      - "7391:3000"
+    working_dir: /app
+    depends_on:
+      - api
+    networks:
+      - terraform-explorer-network
+    restart: always
+
+networks:
+  terraform-explorer-network:
+    driver: bridge
