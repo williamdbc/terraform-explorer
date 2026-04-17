@@ -107,6 +107,10 @@ build/
 !.env.example   # mantém o modelo de exemplo no repositório
 infra/env/*.env
 !infra/env/*.env.example
+infra/data/*
+!infra/data/.gitkeep
+infra/workspace/*
+!infra/workspace/.gitkeep
 
 # Cache / temp
 *.local

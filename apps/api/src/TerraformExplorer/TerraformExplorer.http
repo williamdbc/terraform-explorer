@@ -1,0 +1,6 @@
+@TerraformExplorer_HostAddress = http://localhost:5212
+
+GET {{TerraformExplorer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,142 @@
+﻿using TerraformExplorer.Models;
+using TerraformExplorer.Settings;
+
+namespace TerraformExplorer.Utils;
+
+public static class TerraformStructureLoader
+{
+    public static TerraformStructure Load(TerraformSettings settings)
+    {
+        return new TerraformStructure
+        {
+            RootPath = settings.GetRootPath(),
+            Modules = LoadModules(settings.GetModulesPath()),
+            Accounts = LoadAccounts(settings.GetAccountsPath()),
+            Providers = LoadProviders(settings)
+        };
+    }
+
+    public static List<TerraformModule> LoadModules(string modulesPath)
+    {
+        var modules = new List<TerraformModule>();
+        if (!Directory.Exists(modulesPath))
+            return modules;
+
+        foreach (var moduleDir in Directory.GetDirectories(modulesPath))
+        {
+            modules.Add(new TerraformModule
+            {
+                Name = Path.GetFileName(moduleDir),
+                Path = moduleDir,
+                Files = LoadFiles(moduleDir)
+            });
+        }
+
+        return modules
+            .OrderBy(m => m.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public static List<Account> LoadAccounts(string accountsPath)
+    {
+        var accounts = new List<Account>();
+        if (!Directory.Exists(accountsPath)) return accounts;
+        
+        foreach (var accountDir in Directory.GetDirectories(accountsPath))
+        {
+            var account = new Account
+            {
+                Name = Path.GetFileName(accountDir),
+                Path = accountDir,
+                ProjectGroups = LoadProjectGroups(accountDir)
+            };
+            
+            var providerTfPath = Path.Combine(accountDir, "provider.tf");
+            if (File.Exists(providerTfPath))
+            {
+                var tfConfig = ProviderTfParser.Parse(File.ReadAllText(providerTfPath));
+                account.AwsProfile = tfConfig.Profile;
+                account.Region = tfConfig.Region;
+                account.AssumeRoleArn = tfConfig.AssumeRoleArn;
+            }
+
+            accounts.Add(account);
+        }
+
+        return accounts
+            .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+    
+    public static List<ProjectGroup> LoadProjectGroups(string accountPath)
+    {
+        var projectGroups = new List<ProjectGroup>();
+        foreach (var projectGroupPath in Directory.GetDirectories(accountPath))
+        {
+            projectGroups.Add(new ProjectGroup
+            {
+                Name = Path.GetFileName(projectGroupPath),
+                Path = projectGroupPath,
+                Projects = LoadProjects(projectGroupPath)
+            });
+        }
+
+        return projectGroups
+            .OrderBy(um => um.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public static List<Project> LoadProjects(string projectGroupPath)
+    {
+        var projects = new List<Project>();
+        foreach (var projectDir in Directory.GetDirectories(projectGroupPath))
+        {
+            projects.Add(new Project
+            {
+                Name = Path.GetFileName(projectDir),
+                Path = projectDir,
+                Files = LoadFiles(projectDir)
+            });
+        }
+
+        return projects
+            .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public static List<Provider> LoadProviders(TerraformSettings settings)
+    {
+        var providersPath = settings.GetProvidersPath();
+        if (!Directory.Exists(providersPath))
+            return new List<Provider>();
+
+        var credentialsPath = Path.Combine(providersPath, "credentials.enc");
+        var encryptionKey = settings.GetCredentialsEncryptionKey();
+        var profileResponses = AwsCredentialsFile.ReadProfiles(credentialsPath, encryptionKey);
+        
+        var providers = profileResponses
+            .Select(p => new Provider { Name = p.Name })
+            .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return providers;
+    }
+
+    public static List<TerraformFile> LoadFiles(string directory)
+    {
+        var files = new List<TerraformFile>();
+        foreach (var filePath in Directory.GetFiles(directory))
+        {
+            files.Add(new TerraformFile
+            {
+                Name = Path.GetFileName(filePath),
+                Path = filePath,
+                Type = Path.GetExtension(filePath)
+            });
+        }
+
+        return files
+            .OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+}
