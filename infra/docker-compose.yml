@@ -12,8 +12,8 @@ services:
     ports:
       - "5179:5000"
     volumes:
-      - ./data:/app/data
-      - ./workspace:/app/workspace
+      - ${DATA_DIR:-./data}:/app/data
+      - ${WORKSPACE_DIR:-./workspace}:/app/workspace
     working_dir: /app
     networks:
       - terraform-explorer-network
