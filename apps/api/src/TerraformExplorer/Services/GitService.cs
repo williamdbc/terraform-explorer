@@ -76,7 +76,7 @@ public class GitService
             throw new BusinessException("O diretório já possui um repositório Git inicializado.");
 
         if (string.IsNullOrWhiteSpace(_gitSettings.RepoUrl))
-            throw new BusinessException("URL do repositório não configurada (GIT_REPO_URL).");
+            throw new BusinessException("URL do repositório não configurada (GitSettings:RepoUrl).");
 
         var rootPath = _terraformSettings.GetRootPath();
         var tmpDir = Path.Combine(Path.GetTempPath(), $"git-clone-{Guid.NewGuid():N}");
@@ -190,7 +190,7 @@ public class GitService
             throw new BusinessException("Repositório Git não inicializado.");
 
         if (string.IsNullOrWhiteSpace(_gitSettings.Token))
-            throw new BusinessException("Token Git não configurado (GIT_TOKEN).");
+            throw new BusinessException("Token Git não configurado (GitSettings:Token).");
 
         var authenticatedUrl = BuildAuthenticatedUrl();
         var branchResult = await RunGitAsync("rev-parse --abbrev-ref HEAD");
@@ -223,7 +223,7 @@ public class GitService
     {
         var url = _gitSettings.RepoUrl;
         if (string.IsNullOrWhiteSpace(url))
-            throw new BusinessException("URL do repositório Git não configurada (GIT_REPO_URL).");
+            throw new BusinessException("URL do repositório Git não configurada (GitSettings:RepoUrl).");
 
         if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             return url;
