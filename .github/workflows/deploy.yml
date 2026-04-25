@@ -33,9 +33,8 @@ jobs:
 
       - name: Preparar diretórios persistentes
         run: |
-          set -a
-          . infra/env/compose.env
-          set +a
+          DATA_DIR=$(grep '^DATA_DIR=' infra/env/compose.env | cut -d '=' -f2-)
+          WORKSPACE_DIR=$(grep '^WORKSPACE_DIR=' infra/env/compose.env | cut -d '=' -f2-)
 
           mkdir -p "$DATA_DIR"
           mkdir -p "$WORKSPACE_DIR"
@@ -73,9 +72,8 @@ jobs:
 
       - name: Preparar diretórios persistentes
         run: |
-          set -a
-          . infra/env/compose.env
-          set +a
+          DATA_DIR=$(grep '^DATA_DIR=' infra/env/compose.env | cut -d '=' -f2-)
+          WORKSPACE_DIR=$(grep '^WORKSPACE_DIR=' infra/env/compose.env | cut -d '=' -f2-)
 
           mkdir -p "$DATA_DIR"
           mkdir -p "$WORKSPACE_DIR"
