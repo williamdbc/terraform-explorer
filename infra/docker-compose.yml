@@ -10,7 +10,7 @@ services:
     env_file:
       - ./env/api.env
     ports:
-      - "5179:5000"
+      - "5000:5000"
     volumes:
       - ${DATA_DIR}:/app/data
       - ${WORKSPACE_DIR}:/app/workspace
@@ -30,7 +30,7 @@ services:
     env_file:
       - ./env/web.env
     ports:
-      - "7391:3000"
+      - "3000:3000"
     working_dir: /app
     depends_on:
       - api
